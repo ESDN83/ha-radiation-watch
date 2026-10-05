@@ -41,6 +41,8 @@ Ambient dose rate stations around your home on a map, with a wind based early wa
    `https://github.com/ESDN83/ha-radiation-watch` with type *Integration*.
 2. Install **Radiation Watch** and restart Home Assistant.
 3. *Settings > Devices & services > Add integration > Radiation Watch*.
+4. Reload open browser tabs once (F5), close and reopen the companion app.
+   A page that was open during the restart does not know the card yet.
 
 ### Manual
 

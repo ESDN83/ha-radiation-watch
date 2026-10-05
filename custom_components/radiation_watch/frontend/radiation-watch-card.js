@@ -10,7 +10,7 @@
  * Texts live in locales/<lang>.json next to this file, English is the fallback.
  */
 
-const CARD_VERSION = "0.1.0";
+const CARD_VERSION = "0.1.2";
 const BASE = "/radiation_watch_files/frontend";
 const LOCALES = {};
 const LOADING = {};
@@ -163,13 +163,27 @@ class RadiationWatchCard extends HTMLElement {
       this.shadowRoot.innerHTML = `<ha-card><div style="padding:16px">${esc(this._t("errors.no_entity"))}</div></ha-card>`;
       return;
     }
-    this.shadowRoot.innerHTML = this._html(ew, stEnt, local);
+    // While the integration (re)loads the sensor is unavailable and has no attributes.
+    // Show that instead of drawing, the card redraws by itself once the data is back.
+    if (!Array.isArray(ew.attributes.home)) {
+      const st = ["unknown", "unavailable"].includes(ew.state) ? ew.state : "unavailable";
+      this.shadowRoot.innerHTML = `<ha-card><ha-alert alert-type="warning" title="${esc(this._t(`status.${st}.title`))}">${esc(this._t(`status.${st}.text`))}</ha-alert><div style="height:12px"></div></ha-card>`;
+      return;
+    }
+    // Never throw out of the hass setter: Home Assistant would replace the card with a
+    // permanent configuration error until the page is reloaded.
+    try {
+      this.shadowRoot.innerHTML = this._html(ew, stEnt, local);
+    } catch (err) {
+      console.error("radiation-watch-card", err);
+      this.shadowRoot.innerHTML = `<ha-card><div style="padding:16px">Radiation Watch: ${esc(err && err.message)}</div></ha-card>`;
+    }
   }
 
   _html(ew, stEnt, local) {
     const c = this._config, h = this._hass, a = ew.attributes;
     const far = this._view === "far";
-    const KM = far ? a.radius_far : a.radius_near;
+    const KM = (far ? a.radius_far : a.radius_near) || (far ? 120 : 40);
     const C = 200, R = 180, k = R / KM;
     const [hlat, hlon] = a.home;
     const rules = a.rules || {};

@@ -3,12 +3,12 @@
   "name": "Radiation Watch",
   "codeowners": ["@ESDN83"],
   "config_flow": true,
-  "dependencies": ["http", "frontend"],
+  "dependencies": ["http", "frontend", "lovelace"],
   "documentation": "https://github.com/ESDN83/ha-radiation-watch",
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/ESDN83/ha-radiation-watch/issues",
   "requirements": [],
   "single_config_entry": true,
-  "version": "0.1.0"
+  "version": "0.1.2"
 }

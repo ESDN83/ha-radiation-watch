@@ -8,6 +8,7 @@ from pathlib import Path
 
 from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.components.http import StaticPathConfig
+from homeassistant.components.lovelace.const import LOVELACE_DATA
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -102,8 +103,34 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             StaticPathConfig(URL_MAPS, str(folder), False),
         ]
     )
-    # Version in the URL so browsers fetch the new card after an update.
-    add_extra_js_url(hass, f"{URL_FRONTEND}/{CARD_FILE}?v={VERSION}")
+    # Version in the URL so browsers and the companion app fetch the new card after an update.
+    card_url = f"{URL_FRONTEND}/{CARD_FILE}?v={VERSION}"
+    if not await _async_register_card_resource(hass, card_url):
+        add_extra_js_url(hass, card_url)
+    return True
+
+
+async def _async_register_card_resource(hass: HomeAssistant, card_url: str) -> bool:
+    """Register the card as a dashboard resource, the way HACS does it.
+
+    add_extra_js_url alone is not enough: the Android companion app never loaded the
+    card that way (it was not even requested), while dashboard resources load everywhere.
+    Only possible with resources in storage mode; YAML mode falls back to add_extra_js_url.
+    """
+    ll = hass.data.get(LOVELACE_DATA)
+    if ll is None or ll.resource_mode != "storage":
+        return False
+    resources = ll.resources
+    await resources.async_get_info()  # makes sure the collection is loaded
+    base = card_url.split("?")[0]
+    ours = [r for r in resources.async_items() if str(r.get("url", "")).split("?")[0] == base]
+    if not ours:
+        await resources.async_create_item({"res_type": "module", "url": card_url})
+        return True
+    if ours[0].get("url") != card_url:
+        await resources.async_update_item(ours[0]["id"], {"res_type": "module", "url": card_url})
+    for extra in ours[1:]:
+        await resources.async_delete_item(extra["id"])
     return True
 
 
@@ -158,3 +185,14 @@ async def _async_options_updated(hass: HomeAssistant, entry: ConfigEntry) -> Non
 
 async def async_unload_entry(hass: HomeAssistant, entry: RadiationWatchConfigEntry) -> bool:
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Integration removed: take the card resource out of the dashboards again."""
+    ll = hass.data.get(LOVELACE_DATA)
+    if ll is None or ll.resource_mode != "storage":
+        return
+    base = f"{URL_FRONTEND}/{CARD_FILE}"
+    for r in list(ll.resources.async_items()):
+        if str(r.get("url", "")).split("?")[0] == base:
+            await ll.resources.async_delete_item(r["id"])

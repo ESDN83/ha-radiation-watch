@@ -10,7 +10,7 @@
  * Texts live in locales/<lang>.json next to this file, English is the fallback.
  */
 
-const CARD_VERSION = "0.2.3";
+const CARD_VERSION = "0.2.4";
 const BASE = "/radiation_watch_files/frontend";
 const LOCALES = {};
 const LOADING = {};

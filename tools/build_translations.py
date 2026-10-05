@@ -9,6 +9,7 @@ from pathlib import Path
 
 TEXT = {
     "en": dict(
+        med="Regional median",
         bs="Warning", msg="Message", alert="Alert", ev_warning="Warning", ev_notable="Station notable", ev_clear="All clear",
         n_svc="Send notifications to", n_notable="Also notify when a station is notable", n_clear="Notify the all clear",
         d_n_svc="Notify services, for example notify.mobile_app_phone. Empty: no notifications. The entities and the alert event work either way.",
@@ -29,6 +30,7 @@ TEXT = {
         st="Stations", ew="Early warning", calm="Calm", notable="Notable", warning="Warning", btn="Regenerate map",
     ),
     "de": dict(
+        med="Median Region",
         bs="Warnung", msg="Meldung", alert="Alarm", ev_warning="Warnung", ev_notable="Station auffällig", ev_clear="Entwarnung",
         n_svc="Benachrichtigungen senden an", n_notable="Auch bei auffälliger Station benachrichtigen", n_clear="Entwarnung senden",
         d_n_svc="Notify-Dienste, zum Beispiel notify.mobile_app_handy. Leer: keine Benachrichtigungen. Die Entitäten und das Alarm-Ereignis funktionieren trotzdem.",
@@ -49,6 +51,7 @@ TEXT = {
         st="Stationen", ew="Frühwarnung", calm="Ruhig", notable="Auffällig", warning="Warnung", btn="Karte neu erzeugen",
     ),
     "fr": dict(
+        med="Médiane régionale",
         bs="Alerte", msg="Message", alert="Alarme", ev_warning="Alerte", ev_notable="Station remarquable", ev_clear="Fin d'alerte",
         n_svc="Envoyer les notifications à", n_notable="Notifier aussi une station remarquable", n_clear="Notifier la fin d'alerte",
         d_n_svc="Services notify, par exemple notify.mobile_app_telephone. Vide : pas de notifications. Les entités et l'événement fonctionnent quand même.",
@@ -69,6 +72,7 @@ TEXT = {
         st="Stations", ew="Alerte précoce", calm="Calme", notable="Remarquable", warning="Alerte", btn="Régénérer la carte",
     ),
     "es": dict(
+        med="Mediana regional",
         bs="Alerta", msg="Mensaje", alert="Alarma", ev_warning="Alerta", ev_notable="Estación llamativa", ev_clear="Fin de la alerta",
         n_svc="Enviar notificaciones a", n_notable="Notificar también una estación llamativa", n_clear="Notificar el fin de la alerta",
         d_n_svc="Servicios notify, por ejemplo notify.mobile_app_telefono. Vacío: sin notificaciones. Las entidades y el evento funcionan igualmente.",
@@ -119,6 +123,7 @@ def build(t: dict) -> dict:
                 "stations": {"name": t["st"]},
                 "early_warning": {"name": t["ew"], "state": {"calm": t["calm"], "notable": t["notable"], "warning": t["warning"]}},
                 "message": {"name": t["msg"]},
+                "median": {"name": t["med"]},
             },
             "binary_sensor": {"warning": {"name": t["bs"]}},
             "event": {"alert": {"name": t["alert"], "state_attributes": {"event_type": {"state": {

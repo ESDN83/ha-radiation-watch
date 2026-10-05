@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 DOMAIN = "radiation_watch"
-VERSION = "0.2.0"
+VERSION = "0.2.3"
 
 # Config entry keys
 CONF_LATITUDE = "latitude"

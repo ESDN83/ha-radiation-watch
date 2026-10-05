@@ -1,8 +1,22 @@
 {
-  "directions": ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
-  "view": { "near": "Near: {km} km", "far": "Far: {km} km" },
+  "directions": [
+    "N",
+    "NE",
+    "E",
+    "SE",
+    "S",
+    "SW",
+    "W",
+    "NW"
+  ],
+  "view": {
+    "near": "Near: {km} km",
+    "far": "Far: {km} km"
+  },
   "stations": "{n} stations",
-  "tap": { "to_far": "Tap for the far view.", "to_near": "Tap for the near view." },
+  "tap": {
+    "station": "Tap a station for details."
+  },
   "wind": {
     "from": "Wind from {dir}",
     "hint": "The shaded sector shows the stations whose air is heading towards you, the arcs how long it takes to get here.",
@@ -21,13 +35,30 @@
   "map_building": "Map images are being built, this takes a minute.",
   "attribution": "Map © OpenStreetMap contributors · Data BfS, EURDEP",
   "status": {
-    "calm": { "title": "Early warning: calm", "text": "All stations within {km} km are in the normal range." },
-    "notable": { "title": "Early warning: station notable", "text": "The wind does not come from its direction. Keep an eye on the map." },
-    "warning": { "title": "Early warning: elevated radiation upwind", "text": "A station on the windward side measures clearly more than the others. Arrival time below the map. Close the windows, follow your emergency plan." },
-    "unknown": { "title": "Early warning: no data", "text": "Check the Radiation Watch integration." },
-    "unavailable": { "title": "Early warning: no data", "text": "Check the Radiation Watch integration." }
+    "calm": {
+      "title": "Early warning: calm",
+      "text": "All stations within {km} km are in the normal range."
+    },
+    "notable": {
+      "title": "Early warning: station notable",
+      "text": "The wind does not come from its direction. Keep an eye on the map."
+    },
+    "warning": {
+      "title": "Early warning: elevated radiation upwind",
+      "text": "A station on the windward side measures clearly more than the others. Arrival time below the map. Close the windows, follow your emergency plan."
+    },
+    "unknown": {
+      "title": "Early warning: no data",
+      "text": "Check the Radiation Watch integration."
+    },
+    "unavailable": {
+      "title": "Early warning: no data",
+      "text": "Check the Radiation Watch integration."
+    }
   },
-  "errors": { "no_entity": "Radiation Watch: early warning sensor not found. Set it up under Settings > Devices & services." },
+  "errors": {
+    "no_entity": "Radiation Watch: early warning sensor not found. Set it up under Settings > Devices & services."
+  },
   "editor": {
     "entity": "Early warning sensor",
     "local_sensors": "Own measuring points (µSv/h)",
@@ -42,6 +73,20 @@
     "show_status": "Status banner",
     "show_legend": "Legend",
     "show_names": "Station names",
-    "show_values": "Station values"
+    "show_values": "Station values",
+    "local_entity": "Sensor (µSv/h)",
+    "local_name": "Short name",
+    "opt_near": "Near",
+    "opt_far": "Far",
+    "style_auto": "Follow theme",
+    "style_light": "Light",
+    "style_dark": "Dark",
+    "style_none": "No map"
+  },
+  "info": {
+    "normal": "normal range",
+    "notable": "notable, not upwind",
+    "upwind": "notable and upwind: arrives about {eta} after the measurement",
+    "close": "Close"
   }
 }

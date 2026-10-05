@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -31,7 +31,7 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: RadiationWatchConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
 ) -> None:
     stations = StationsSensor(entry)
-    async_add_entities([stations, EarlyWarningSensor(entry, stations), MessageSensor(entry)])
+    async_add_entities([stations, EarlyWarningSensor(entry, stations), MessageSensor(entry), MedianSensor(entry)])
 
 
 class StationsSensor(CoordinatorEntity[StationCoordinator], SensorEntity):
@@ -167,3 +167,21 @@ class MessageSensor(EngineEntity, SensorEntity):
     def extra_state_attributes(self) -> dict:
         r = self.engine.state.result
         return {"title": self.engine.state.title, "level": r.state if r else None}
+
+
+class MedianSensor(EngineEntity, SensorEntity):
+    """Regional background: median dose rate of all stations within the far radius, with history."""
+
+    _attr_translation_key = "median"
+    _attr_icon = "mdi:radioactive"
+    _attr_native_unit_of_measurement = "µSv/h"
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_suggested_display_precision = 3
+
+    def __init__(self, entry: RadiationWatchConfigEntry) -> None:
+        super().__init__(entry, "median", "sensor.radiation_watch_median")
+
+    @property
+    def native_value(self) -> float | None:
+        r = self.engine.state.result
+        return r.median if r else None

@@ -1,8 +1,22 @@
 {
-  "directions": ["N", "NE", "E", "SE", "S", "SO", "O", "NO"],
-  "view": { "near": "Proche : {km} km", "far": "Lointain : {km} km" },
+  "directions": [
+    "N",
+    "NE",
+    "E",
+    "SE",
+    "S",
+    "SO",
+    "O",
+    "NO"
+  ],
+  "view": {
+    "near": "Proche : {km} km",
+    "far": "Lointain : {km} km"
+  },
   "stations": "{n} stations",
-  "tap": { "to_far": "Touchez pour la vue lointaine.", "to_near": "Touchez pour la vue proche." },
+  "tap": {
+    "station": "Touchez une station pour les détails."
+  },
   "wind": {
     "from": "Vent du {dir}",
     "hint": "Le secteur coloré montre les stations dont l'air se dirige vers vous, les arcs le temps qu'il lui faut pour arriver.",
@@ -21,13 +35,30 @@
   "map_building": "Les images de la carte sont en cours de création, cela prend environ une minute.",
   "attribution": "Carte © contributeurs OpenStreetMap · Données BfS, EURDEP",
   "status": {
-    "calm": { "title": "Alerte précoce : calme", "text": "Toutes les stations dans un rayon de {km} km sont dans la plage normale." },
-    "notable": { "title": "Alerte précoce : station remarquable", "text": "Le vent ne vient pas de sa direction. Surveillez la carte." },
-    "warning": { "title": "Alerte précoce : radiation élevée au vent", "text": "Une station du côté du vent mesure nettement plus que les autres. Heure d'arrivée sous la carte. Fermez les fenêtres, suivez votre plan d'urgence." },
-    "unknown": { "title": "Alerte précoce : pas de données", "text": "Vérifiez l'intégration Radiation Watch." },
-    "unavailable": { "title": "Alerte précoce : pas de données", "text": "Vérifiez l'intégration Radiation Watch." }
+    "calm": {
+      "title": "Alerte précoce : calme",
+      "text": "Toutes les stations dans un rayon de {km} km sont dans la plage normale."
+    },
+    "notable": {
+      "title": "Alerte précoce : station remarquable",
+      "text": "Le vent ne vient pas de sa direction. Surveillez la carte."
+    },
+    "warning": {
+      "title": "Alerte précoce : radiation élevée au vent",
+      "text": "Une station du côté du vent mesure nettement plus que les autres. Heure d'arrivée sous la carte. Fermez les fenêtres, suivez votre plan d'urgence."
+    },
+    "unknown": {
+      "title": "Alerte précoce : pas de données",
+      "text": "Vérifiez l'intégration Radiation Watch."
+    },
+    "unavailable": {
+      "title": "Alerte précoce : pas de données",
+      "text": "Vérifiez l'intégration Radiation Watch."
+    }
   },
-  "errors": { "no_entity": "Radiation Watch : capteur d'alerte introuvable. Configurez-le dans Paramètres > Appareils et services." },
+  "errors": {
+    "no_entity": "Radiation Watch : capteur d'alerte introuvable. Configurez-le dans Paramètres > Appareils et services."
+  },
   "editor": {
     "entity": "Capteur d'alerte précoce",
     "local_sensors": "Points de mesure propres (µSv/h)",
@@ -42,6 +73,20 @@
     "show_status": "Bandeau d'état",
     "show_legend": "Légende",
     "show_names": "Noms des stations",
-    "show_values": "Valeurs des stations"
+    "show_values": "Valeurs des stations",
+    "local_entity": "Capteur (µSv/h)",
+    "local_name": "Nom court",
+    "opt_near": "Proche",
+    "opt_far": "Lointain",
+    "style_auto": "Selon le thème",
+    "style_light": "Clair",
+    "style_dark": "Sombre",
+    "style_none": "Sans carte"
+  },
+  "info": {
+    "normal": "plage normale",
+    "notable": "remarquable, pas au vent",
+    "upwind": "remarquable et au vent : arrivée environ {eta} après la mesure",
+    "close": "Fermer"
   }
 }

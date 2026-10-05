@@ -10,11 +10,10 @@
  * Texts live in locales/<lang>.json next to this file, English is the fallback.
  */
 
-const CARD_VERSION = "0.2.0";
+const CARD_VERSION = "0.2.3";
 const BASE = "/radiation_watch_files/frontend";
 const LOCALES = {};
 const LOADING = {};
-const STORAGE_KEY = "radiation-watch-card-view";
 
 // One shared promise per language: a second card on the page waits for the same download
 // instead of seeing an empty entry and rendering the raw keys.
@@ -32,16 +31,39 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 
 class RadiationWatchCard extends HTMLElement {
   static getConfigForm() {
+    const ed = (LOCALES[(document.querySelector("home-assistant")?.hass?.locale?.language || "en").split("-")[0]] || LOCALES.en || {}).editor || {};
     return {
       schema: [
         { name: "entity", selector: { entity: { domain: "sensor", integration: "radiation_watch" } } },
-        { name: "local_sensors", selector: { entity: { domain: "sensor", multiple: true } } },
+        {
+          // One row per own measuring point (entity + optional short name), with an add button.
+          name: "local_sensors",
+          selector: {
+            object: {
+              multiple: true,
+              label_field: "name",
+              description_field: "entity",
+              fields: {
+                entity: { label: ed.local_entity || "Sensor (µSv/h)", required: true, selector: { entity: { domain: "sensor" } } },
+                name: { label: ed.local_name || "Name", selector: { text: {} } },
+              },
+            },
+          },
+        },
         {
           type: "grid",
           name: "",
           schema: [
-            { name: "start_view", selector: { select: { mode: "dropdown", options: ["near", "far"] } } },
-            { name: "map_style", selector: { select: { mode: "dropdown", options: ["auto", "light", "dark", "none"] } } },
+            { name: "start_view", selector: { select: { mode: "dropdown", options: [
+              { value: "near", label: ed.opt_near || "Near" },
+              { value: "far", label: ed.opt_far || "Far" },
+            ] } } },
+            { name: "map_style", selector: { select: { mode: "dropdown", options: [
+              { value: "auto", label: ed.style_auto || "Follow theme" },
+              { value: "light", label: ed.style_light || "Light" },
+              { value: "dark", label: ed.style_dark || "Dark" },
+              { value: "none", label: ed.style_none || "No map" },
+            ] } } },
             { name: "warn_threshold", selector: { number: { min: 0.01, max: 1000, step: 0.01, mode: "box", unit_of_measurement: "µSv/h" } } },
             { name: "danger_threshold", selector: { number: { min: 0.01, max: 1000, step: 0.01, mode: "box", unit_of_measurement: "µSv/h" } } },
           ],
@@ -96,20 +118,28 @@ class RadiationWatchCard extends HTMLElement {
       local_sensors: [],
       ...config,
     };
-    try {
-      this._view = localStorage.getItem(STORAGE_KEY) || this._config.start_view;
-    } catch (e) {
-      this._view = this._config.start_view;
-    }
+    // The configured start view decides. Remembering the last view in the browser overrode the
+    // preset, so the buttons now only switch until the page is reloaded.
+    this._view = this._config.start_view === "far" ? "far" : "near";
     if (!this.shadowRoot) {
       this.attachShadow({ mode: "open" });
+      // Buttons switch near/far, a tap on a station opens its info box, a tap on the map closes it.
+      // (Tapping the whole map to switch made stations unreachable on phones, hover does not exist there.)
       this.shadowRoot.addEventListener("click", (ev) => {
-        if (!ev.composedPath().some((n) => n.classList && n.classList.contains("map"))) return;
-        this._view = this._view === "far" ? "near" : "far";
-        try {
-          localStorage.setItem(STORAGE_KEY, this._view);
-        } catch (e) {
-          /* private mode: view is not remembered */
+        const path = ev.composedPath();
+        const hit = (attr) => path.find((n) => n.getAttribute && n.getAttribute(attr) !== null);
+        const btn = hit("data-view");
+        const stn = hit("data-st");
+        if (btn) {
+          this._view = btn.getAttribute("data-view");
+          this._sel = null;
+        } else if (stn) {
+          const key = stn.getAttribute("data-st");
+          this._sel = this._sel === key ? null : key;
+        } else if (hit("data-close") || path.some((n) => n.classList && n.classList.contains("map"))) {
+          this._sel = null;
+        } else {
+          return;
         }
         this._render(true);
       });
@@ -154,7 +184,9 @@ class RadiationWatchCard extends HTMLElement {
     const eid = this._entityId();
     const ew = eid && h.states[eid];
     const stEnt = ew && h.states[ew.attributes.stations_entity];
-    const local = (this._config.local_sensors || []).map((x) => (typeof x === "string" ? { entity: x } : x));
+    const local = (this._config.local_sensors || [])
+      .map((x) => (typeof x === "string" ? { entity: x } : x))
+      .filter((x) => x && x.entity);
     // Only redraw when something relevant changed, hass updates arrive many times per second.
     const key = [ew, stEnt, ...local.map((l) => h.states[l.entity]), h.themes?.darkMode, this._view];
     if (!force && this._last && key.length === this._last.length && key.every((v, i) => v === this._last[i])) return;
@@ -249,20 +281,31 @@ class RadiationWatchCard extends HTMLElement {
     }
 
     const upwind = [];
-    st.map((s) => ({ ...s, au: s.v >= absT || s.v >= limit }))
-      .sort((x, y) => x.au - y.au)
+    const sector = rules.sector ?? 45;
+    const all2 = st.map((s) => {
+      const au = s.v >= absT || s.v >= limit;
+      return { ...s, au, up: au && wind && diff(s.b, wb) <= sector, key: `${s.n}|${s.d.toFixed(2)}` };
+    });
+    // Up to 10 notable stations (nearest first) get value and name, also in the far view. More would be clutter.
+    const labelled = new Set(all2.filter((s) => s.au).sort((x, y) => x.d - y.d).slice(0, 10).map((s) => s.key));
+    this._stations = new Map(all2.map((s) => [s.key, s]));
+    all2
+      .sort((x, y) => x.au - y.au || (x.key === this._sel) - (y.key === this._sel))
       .forEach((s) => {
-        const up = s.au && wind && diff(s.b, wb) <= (rules.sector ?? 45);
-        if (up) upwind.push(s);
+        if (s.up) upwind.push(s);
         const x = C + s.dx * k, y = C - s.dy * k;
-        const ring = up ? `stroke:${c.color_danger};stroke-width:3` : s.au ? `stroke:${c.color_warn};stroke-width:3` : `stroke:${halo};stroke-opacity:.6;stroke-width:1`;
+        const ring = s.up ? `stroke:${c.color_danger};stroke-width:3` : s.au ? `stroke:${c.color_warn};stroke-width:3` : `stroke:${halo};stroke-opacity:.6;stroke-width:1`;
         const small = far && !s.au;
+        const showLabel = s.au ? labelled.has(s.key) : !far;
+        const valueColor = s.up ? c.color_danger : s.au ? c.color_warn : label;
         const land = s.l !== "DE" ? ` (${esc(s.l)})` : "";
-        o += `<g><title>${esc(s.n)}${land}: ${f(s.v, 3)} µSv/h, ${f(s.d, 0)} km</title>`;
+        o += `<g class="st" data-st="${esc(s.key)}"><title>${esc(s.n)}${land}: ${f(s.v, 3)} µSv/h, ${f(s.d, 0)} km</title>`;
+        o += `<circle cx="${x}" cy="${y}" r="11" style="fill:transparent"/>`; // finger-sized tap area
+        if (s.key === this._sel) o += `<circle cx="${x}" cy="${y}" r="10" style="fill:none;stroke:${label};stroke-width:2"/>`;
         o += `<circle cx="${x}" cy="${y}" r="${small ? 3.5 : 6}" style="fill:${col(s.v)};${ring}"/>`;
-        if (!small) {
-          if (c.show_values) o += `<text x="${x + 8}" y="${y + 2}" style="font-size:8.5px;font-weight:bold;fill:${label};paint-order:stroke;stroke:${halo};stroke-width:2px">${f(s.v, 3)}</text>`;
-          if (c.show_names) o += `<text x="${x + 8}" y="${y + 10}" style="font-size:6.5px;fill:${label};fill-opacity:.85;paint-order:stroke;stroke:${halo};stroke-width:1.5px">${esc(s.n)}${land}</text>`;
+        if (showLabel) {
+          if (c.show_values || s.au) o += `<text x="${x + 8}" y="${y + 2}" style="font-size:8.5px;font-weight:bold;fill:${valueColor};paint-order:stroke;stroke:${halo};stroke-width:2px">${f(s.v, 3)}</text>`;
+          if (c.show_names || s.au) o += `<text x="${x + 8}" y="${y + 10}" style="font-size:6.5px;fill:${label};fill-opacity:.85;paint-order:stroke;stroke:${halo};stroke-width:1.5px">${esc(s.n)}${land}</text>`;
         }
         o += `</g>`;
       });
@@ -276,10 +319,29 @@ class RadiationWatchCard extends HTMLElement {
     o += `<rect x="${C - 7}" y="${C - 7}" width="14" height="14" rx="3" style="fill:${hm === null ? "var(--secondary-text-color)" : col(hm)};stroke:${label};stroke-width:2"/>`;
     o += `<text x="${C + R}" y="${C + R + 8}" text-anchor="end" style="font-size:7px;fill:var(--secondary-text-color)">${esc(this._t("attribution"))}</text></svg>`;
 
+    // Info box for the tapped station
+    let info = "";
+    const sel = this._sel && this._stations.get(this._sel);
+    if (sel) {
+      const land = sel.l !== "DE" ? ` (${esc(sel.l)})` : "";
+      const dir = Array.isArray(dirs) ? dirs[Math.round(sel.b / 45) % 8] : "";
+      let state = esc(this._t("info.normal"));
+      if (sel.up) {
+        const m = Math.round((sel.d / kmh) * 60);
+        state = `<b style="color:${c.color_danger}">${esc(this._t("info.upwind", { eta: m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min` }))}</b>`;
+      } else if (sel.au) {
+        state = `<b style="color:${c.color_warn}">${esc(this._t("info.notable"))}</b>`;
+      }
+      info = `<div class="info"><button class="close" data-close aria-label="${esc(this._t("info.close"))}">×</button>`
+        + `<b>${esc(sel.n)}${land}</b><br>`
+        + `<span class="dot" style="background:${col(sel.v)};margin-left:0"></span><b>${f(sel.v, 3)} µSv/h</b>, `
+        + `${f(sel.d, 0)} km ${esc(dir)} (${Math.round(sel.b)}°)<br>${state}</div>`;
+    }
+
     // Text below the map
     const dot = (cl) => `<span class="dot" style="background:${cl}"></span>`;
     let t = `<div class="text">`;
-    t += `<b>${esc(this._t(far ? "view.far" : "view.near", { km: f(KM, 0) }))}</b>, ${esc(this._t("stations", { n: st.length }))}. ${esc(this._t(far ? "tap.to_near" : "tap.to_far"))}`;
+    t += `<b>${esc(this._t(far ? "view.far" : "view.near", { km: f(KM, 0) }))}</b>, ${esc(this._t("stations", { n: st.length }))}. ${esc(this._t("tap.station"))}`;
     t += wind
       ? `<br><b>${esc(this._t("wind.from", { dir: Array.isArray(dirs) ? dirs[Math.round(wb / 45) % 8] : "" }))}</b> (${Math.round(wb)}°), ${f(kmh, 1)} km/h. ${esc(this._t("wind.hint"))}`
       : `<br>${esc(this._t("wind.none"))}`;
@@ -297,6 +359,10 @@ class RadiationWatchCard extends HTMLElement {
     if (a.map_status === "building") t += `<br><i>${esc(this._t("map_building"))}</i>`;
     t += `</div>`;
 
+    const seg = `<div class="seg">`
+      + `<button data-view="near" class="${far ? "" : "on"}">${esc(this._t("view.near", { km: f(a.radius_near || 40, 0) }))}</button>`
+      + `<button data-view="far" class="${far ? "on" : ""}">${esc(this._t("view.far", { km: f(a.radius_far || 120, 0) }))}</button></div>`;
+
     let status = "";
     if (c.show_status) {
       const type = { calm: "success", notable: "warning", warning: "error" }[ew.state] || "info";
@@ -306,10 +372,16 @@ class RadiationWatchCard extends HTMLElement {
     return `<style>
       ha-card { overflow: hidden; }
       ha-alert { display: block; margin: 12px 12px 0; }
-      .map { display: block; width: 100%; max-width: 640px; margin: 0 auto; cursor: pointer; }
+      .map { display: block; width: 100%; max-width: 640px; margin: 0 auto; }
       .text { padding: 8px 16px 14px; font-size: 13px; line-height: 1.6; }
       .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 4px 0 8px; vertical-align: middle; }
-    </style><ha-card>${status}${o}${t}</ha-card>`;
+      .seg { display: flex; justify-content: center; gap: 8px; margin: 12px 12px 0; }
+      .seg button { flex: 0 1 160px; padding: 8px 10px; border-radius: 18px; border: 1px solid var(--divider-color); background: transparent; color: var(--primary-text-color); font: inherit; font-size: 13px; cursor: pointer; }
+      .seg button.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--text-primary-color, #fff); font-weight: 600; }
+      .st { cursor: pointer; }
+      .info { position: relative; margin: 4px 16px 0; padding: 10px 36px 10px 12px; border-radius: 10px; background: var(--secondary-background-color); font-size: 13px; line-height: 1.6; }
+      .info .close { position: absolute; top: 4px; right: 6px; border: 0; background: transparent; color: var(--secondary-text-color); font-size: 20px; cursor: pointer; }
+    </style><ha-card>${status}${seg}${o}${info}${t}</ha-card>`;
   }
 }
 
@@ -320,7 +392,7 @@ if (!customElements.get("radiation-watch-card")) {
     type: "radiation-watch-card",
     name: "Radiation Watch",
     description: "Dose rate stations around home with wind sector and travel time arcs.",
-    preview: false,
+    preview: true,
   });
   console.info(`%c RADIATION-WATCH-CARD %c ${CARD_VERSION} `, "background:#43a047;color:#fff", "background:#333;color:#fff");
 }

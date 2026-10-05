@@ -90,6 +90,9 @@
       },
       "message": {
         "name": "Meldung"
+      },
+      "median": {
+        "name": "Median Region"
       }
     },
     "binary_sensor": {

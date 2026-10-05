@@ -1,8 +1,22 @@
 {
-  "directions": ["N", "NO", "O", "SO", "S", "SW", "W", "NW"],
-  "view": { "near": "Nah: {km} km", "far": "Weit: {km} km" },
+  "directions": [
+    "N",
+    "NO",
+    "O",
+    "SO",
+    "S",
+    "SW",
+    "W",
+    "NW"
+  ],
+  "view": {
+    "near": "Nah: {km} km",
+    "far": "Weit: {km} km"
+  },
   "stations": "{n} Stationen",
-  "tap": { "to_far": "Antippen für die Weit-Ansicht.", "to_near": "Antippen für die Nah-Ansicht." },
+  "tap": {
+    "station": "Station antippen für Details."
+  },
   "wind": {
     "from": "Wind aus {dir}",
     "hint": "Der blaue Bereich zeigt die Stationen, deren Luft zu uns zieht, die Bögen, wie lange sie bis hierher braucht.",
@@ -21,13 +35,30 @@
   "map_building": "Die Kartenbilder werden erzeugt, das dauert etwa eine Minute.",
   "attribution": "Karte © OpenStreetMap-Mitwirkende · Daten BfS, EURDEP",
   "status": {
-    "calm": { "title": "Frühwarnung: ruhig", "text": "Alle Stationen bis {km} km im normalen Bereich." },
-    "notable": { "title": "Frühwarnung: Station auffällig", "text": "Der Wind kommt nicht aus ihrer Richtung. Karte beobachten." },
-    "warning": { "title": "Frühwarnung: erhöhte Strahlung im Wind", "text": "Eine Station auf der Windseite misst deutlich mehr als die übrigen. Ankunftszeit unter der Karte. Fenster zu, Notfallplan." },
-    "unknown": { "title": "Frühwarnung: keine Daten", "text": "Integration Radiation Watch prüfen." },
-    "unavailable": { "title": "Frühwarnung: keine Daten", "text": "Integration Radiation Watch prüfen." }
+    "calm": {
+      "title": "Frühwarnung: ruhig",
+      "text": "Alle Stationen bis {km} km im normalen Bereich."
+    },
+    "notable": {
+      "title": "Frühwarnung: Station auffällig",
+      "text": "Der Wind kommt nicht aus ihrer Richtung. Karte beobachten."
+    },
+    "warning": {
+      "title": "Frühwarnung: erhöhte Strahlung im Wind",
+      "text": "Eine Station auf der Windseite misst deutlich mehr als die übrigen. Ankunftszeit unter der Karte. Fenster zu, Notfallplan."
+    },
+    "unknown": {
+      "title": "Frühwarnung: keine Daten",
+      "text": "Integration Radiation Watch prüfen."
+    },
+    "unavailable": {
+      "title": "Frühwarnung: keine Daten",
+      "text": "Integration Radiation Watch prüfen."
+    }
   },
-  "errors": { "no_entity": "Radiation Watch: Frühwarn-Sensor nicht gefunden. Unter Einstellungen > Geräte & Dienste einrichten." },
+  "errors": {
+    "no_entity": "Radiation Watch: Frühwarn-Sensor nicht gefunden. Unter Einstellungen > Geräte & Dienste einrichten."
+  },
   "editor": {
     "entity": "Frühwarn-Sensor",
     "local_sensors": "Eigene Messstellen (µSv/h)",
@@ -42,6 +73,20 @@
     "show_status": "Statuszeile",
     "show_legend": "Legende",
     "show_names": "Stationsnamen",
-    "show_values": "Stationswerte"
+    "show_values": "Stationswerte",
+    "local_entity": "Sensor (µSv/h)",
+    "local_name": "Kurzname",
+    "opt_near": "Nah",
+    "opt_far": "Weit",
+    "style_auto": "Wie das Theme",
+    "style_light": "Hell",
+    "style_dark": "Dunkel",
+    "style_none": "Ohne Karte"
+  },
+  "info": {
+    "normal": "normaler Bereich",
+    "notable": "auffällig, nicht im Wind",
+    "upwind": "auffällig und im Wind: Ankunft ca. {eta} nach der Messung",
+    "close": "Schließen"
   }
 }

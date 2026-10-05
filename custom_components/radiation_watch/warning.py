@@ -127,14 +127,23 @@ class WarningEngine:
         self.async_evaluate()
 
     def _wind(self) -> tuple[float | None, float | None, str | None]:
+        """First source with usable wind (>= min_wind), else the first one with any wind data.
+
+        A garden anemometer often reads 0 at night while the regional wind keeps blowing, and for a
+        plume the regional wind counts. So a calm main source hands over to the fallback.
+        """
         s = self.settings
+        readings = []
         for entity_id in (s["wind_entity"], s["wind_fallback"]):
             if not entity_id or (st := self.hass.states.get(entity_id)) is None:
                 continue
             bearing, speed = st.attributes.get("wind_bearing"), st.attributes.get("wind_speed")
             if isinstance(bearing, (int, float)) and isinstance(speed, (int, float)):
-                return float(bearing), to_kmh(float(speed), st.attributes.get("wind_speed_unit")), entity_id
-        return None, None, None
+                readings.append((float(bearing), to_kmh(float(speed), st.attributes.get("wind_speed_unit")), entity_id))
+        for reading in readings:
+            if reading[1] >= s["min_wind"]:
+                return reading
+        return readings[0] if readings else (None, None, None)
 
     @callback
     def async_evaluate(self) -> None:

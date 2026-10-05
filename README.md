@@ -25,7 +25,9 @@ Ambient dose rate stations around your home on a map, with a wind based early wa
   distance and estimated arrival time are in the attributes.
 - **Map card** that comes with the integration: stations in their true direction and distance,
   coloured by dose rate, the wind sector, and **travel time arcs** that show how long air from that
-  distance needs to reach you at the current wind speed. Tap to switch between near and far view.
+  distance needs to reach you at the current wind speed. Buttons switch between near and far view,
+  tapping a station shows its value, distance, direction and, if upwind, the arrival time.
+  During an alert the nearest notable stations (up to 10) are labelled in red or orange.
 - The map background is built **once** from OpenStreetMap tiles during setup and then served by
   Home Assistant itself. No tiles are loaded while you look at the card, it works offline.
 - Multilingual: English, German, French, Spanish. Adding a language is one JSON file, see below.
@@ -70,7 +72,7 @@ Outside Europe there are no stations in these sources.
 | Near radius | 40 km | radius of the near view |
 | Far radius | 120 km | radius of the far view and of the station search |
 | Weather entity for wind | none | any `weather.*` entity with `wind_bearing` and `wind_speed` |
-| Fallback weather entity | none | used when the first one has no wind data |
+| Fallback weather entity | none | used when the first one has no wind data or reports less than the minimum wind speed (a garden anemometer often reads 0 at night while the regional wind still blows) |
 | Update interval | 30 min | the sources update hourly |
 
 Later, under *Configure*, you can also tune the warning rules:

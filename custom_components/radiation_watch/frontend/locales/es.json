@@ -1,8 +1,22 @@
 {
-  "directions": ["N", "NE", "E", "SE", "S", "SO", "O", "NO"],
-  "view": { "near": "Cerca: {km} km", "far": "Lejos: {km} km" },
+  "directions": [
+    "N",
+    "NE",
+    "E",
+    "SE",
+    "S",
+    "SO",
+    "O",
+    "NO"
+  ],
+  "view": {
+    "near": "Cerca: {km} km",
+    "far": "Lejos: {km} km"
+  },
   "stations": "{n} estaciones",
-  "tap": { "to_far": "Toque para la vista lejana.", "to_near": "Toque para la vista cercana." },
+  "tap": {
+    "station": "Toque una estación para ver detalles."
+  },
   "wind": {
     "from": "Viento del {dir}",
     "hint": "El sector coloreado muestra las estaciones cuyo aire se dirige hacia usted, los arcos cuánto tarda en llegar.",
@@ -21,13 +35,30 @@
   "map_building": "Se están generando las imágenes del mapa, tarda alrededor de un minuto.",
   "attribution": "Mapa © colaboradores de OpenStreetMap · Datos BfS, EURDEP",
   "status": {
-    "calm": { "title": "Alerta temprana: tranquilo", "text": "Todas las estaciones en {km} km están en el rango normal." },
-    "notable": { "title": "Alerta temprana: estación llamativa", "text": "El viento no viene de su dirección. Vigile el mapa." },
-    "warning": { "title": "Alerta temprana: radiación elevada a barlovento", "text": "Una estación del lado del viento mide claramente más que las demás. Hora de llegada bajo el mapa. Cierre las ventanas, siga su plan de emergencia." },
-    "unknown": { "title": "Alerta temprana: sin datos", "text": "Compruebe la integración Radiation Watch." },
-    "unavailable": { "title": "Alerta temprana: sin datos", "text": "Compruebe la integración Radiation Watch." }
+    "calm": {
+      "title": "Alerta temprana: tranquilo",
+      "text": "Todas las estaciones en {km} km están en el rango normal."
+    },
+    "notable": {
+      "title": "Alerta temprana: estación llamativa",
+      "text": "El viento no viene de su dirección. Vigile el mapa."
+    },
+    "warning": {
+      "title": "Alerta temprana: radiación elevada a barlovento",
+      "text": "Una estación del lado del viento mide claramente más que las demás. Hora de llegada bajo el mapa. Cierre las ventanas, siga su plan de emergencia."
+    },
+    "unknown": {
+      "title": "Alerta temprana: sin datos",
+      "text": "Compruebe la integración Radiation Watch."
+    },
+    "unavailable": {
+      "title": "Alerta temprana: sin datos",
+      "text": "Compruebe la integración Radiation Watch."
+    }
   },
-  "errors": { "no_entity": "Radiation Watch: no se encontró el sensor de alerta. Configúrelo en Ajustes > Dispositivos y servicios." },
+  "errors": {
+    "no_entity": "Radiation Watch: no se encontró el sensor de alerta. Configúrelo en Ajustes > Dispositivos y servicios."
+  },
   "editor": {
     "entity": "Sensor de alerta temprana",
     "local_sensors": "Puntos de medición propios (µSv/h)",
@@ -42,6 +73,20 @@
     "show_status": "Banda de estado",
     "show_legend": "Leyenda",
     "show_names": "Nombres de estaciones",
-    "show_values": "Valores de estaciones"
+    "show_values": "Valores de estaciones",
+    "local_entity": "Sensor (µSv/h)",
+    "local_name": "Nombre corto",
+    "opt_near": "Cerca",
+    "opt_far": "Lejos",
+    "style_auto": "Según el tema",
+    "style_light": "Claro",
+    "style_dark": "Oscuro",
+    "style_none": "Sin mapa"
+  },
+  "info": {
+    "normal": "rango normal",
+    "notable": "llamativa, no a barlovento",
+    "upwind": "llamativa y a barlovento: llega unos {eta} después de la medición",
+    "close": "Cerrar"
   }
 }

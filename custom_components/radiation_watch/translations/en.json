@@ -48,7 +48,10 @@
           "median_offset": "Minimum distance above median",
           "sector": "Wind sector",
           "min_wind": "Minimum wind speed",
-          "max_age": "Maximum data age"
+          "max_age": "Maximum data age",
+          "notify_services": "Send notifications to",
+          "notify_notable": "Also notify when a station is notable",
+          "notify_all_clear": "Notify the all clear"
         },
         "data_description": {
           "latitude": "Centre of the map, defaults to your Home Assistant location.",
@@ -61,7 +64,10 @@
           "median_offset": "A station is notable when it is above median x factor and above median + minimum distance.",
           "sector": "A notable station within this angle either side of the wind direction raises a warning.",
           "min_wind": "Below this the wind direction is too unsteady to be used.",
-          "max_age": "Older measurements are dropped."
+          "max_age": "Older measurements are dropped.",
+          "notify_services": "Notify services, for example notify.mobile_app_phone. Empty: no notifications. The entities and the alert event work either way.",
+          "notify_notable": "Otherwise only for a warning (notable station upwind).",
+          "notify_all_clear": "When the level goes back to calm."
         }
       }
     },
@@ -80,6 +86,28 @@
           "calm": "Calm",
           "notable": "Notable",
           "warning": "Warning"
+        }
+      },
+      "message": {
+        "name": "Message"
+      }
+    },
+    "binary_sensor": {
+      "warning": {
+        "name": "Warning"
+      }
+    },
+    "event": {
+      "alert": {
+        "name": "Alert",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "warning": "Warning",
+              "notable": "Station notable",
+              "all_clear": "All clear"
+            }
+          }
         }
       }
     },

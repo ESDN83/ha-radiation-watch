@@ -48,6 +48,20 @@ Ambient dose rate stations around your home on a map, with a wind based early wa
 
 Copy `custom_components/radiation_watch` into your `config/custom_components` folder and restart.
 
+## Where the stations come from
+
+Nothing to configure: the integration takes your Home Assistant location (or the point you
+enter) and fetches **every station within the far radius** from the open BfS WFS service:
+
+- **Germany**: the BfS ODL network (about 1,700 probes), layer `odlinfo_odl_1h_latest`.
+- **All other European countries**: the EURDEP exchange (about 5,000 stations, for example
+  Belgium, Netherlands, Luxembourg, France, Austria, Switzerland, Czechia, Poland), layer
+  `eurdep_latestValue`. BfS republishes it without the German stations, so nothing is counted twice.
+
+Move the location or change the radius and the station list follows on the next update.
+No other integration is needed (the separate *BfS ODL* integration is not used).
+Outside Europe there are no stations in these sources.
+
 ## Setup
 
 | Option | Default | Meaning |
@@ -73,22 +87,40 @@ Later, under *Configure*, you can also tune the warning rules:
 The median is taken over all stations within the far radius, so normal regional differences
 (for example lower values in Belgium than in the Eifel) do not trigger anything.
 
+Also under *Configure*: **notifications**. Pick one or more notify services (for example
+`notify.mobile_app_phone`) and the integration sends the warning itself, in your Home Assistant
+language. Optionally also for a notable station and for the all clear. Leave it empty if you
+prefer your own automations, the entities below work either way.
+
 ## Entities
 
 | Entity | State | Notes |
 |---|---|---|
-| `sensor.radiation_watch_early_warning` | `calm` / `notable` / `warning` | attributes: wind, median, limit, `upwind` (name, country, distance, bearing, value, `eta_min`), `notable` |
+| `sensor.radiation_watch_early_warning` | `calm` / `notable` / `warning` | attributes: wind, median, limit, `upwind` (name, country, distance, bearing, value, `eta_min`), `notable`, `message` |
+| `binary_sensor.radiation_watch_warning` | on / off | on while there is a warning (device class safety) |
+| `sensor.radiation_watch_message` | ready-made text | in your HA language, nearest stations first, for notifications or TTS; attribute `title` |
+| `event.radiation_watch_alert` | event | fires on a change of level: `warning`, `notable`, `all_clear`; event data: `title`, `message`, `upwind`, `notable` |
 | `sensor.radiation_watch_stations` | number of stations | attribute `stations`: `[name, lat, lon, µSv/h, country]`, not stored in the recorder |
 | `button.radiation_watch_regenerate_map` | | downloads the tiles again and rebuilds the map images |
 
-Example automation trigger:
+Own automation, for example a message to a phone and a smart speaker:
 
 ```yaml
 triggers:
   - trigger: state
-    entity_id: sensor.radiation_watch_early_warning
+    entity_id: event.radiation_watch_alert
+    attribute: event_type
     to: warning
+actions:
+  - action: notify.mobile_app_phone
+    data:
+      title: "{{ trigger.to_state.attributes.title }}"
+      message: "{{ trigger.to_state.attributes.message }}"
 ```
+
+Or simply `binary_sensor.radiation_watch_warning` turning `on`.
+
+Message texts live in `custom_components/radiation_watch/messages/<lang>.json`.
 
 ## Card
 
@@ -124,6 +156,7 @@ when they arrive, so subtract that.
 
 ## Adding a language
 
+- Warning and notification texts: `custom_components/radiation_watch/messages/<lang>.json`, copy `en.json`.
 - Integration texts: `custom_components/radiation_watch/translations/<lang>.json`
   (generated from `tools/build_translations.py`, copy a block there or edit the JSON directly).
 - Card texts: `custom_components/radiation_watch/frontend/locales/<lang>.json`, copy `en.json` and translate.

@@ -1,0 +1,21 @@
+{
+  "decimal_comma": false,
+  "directions": [
+    "N",
+    "NE",
+    "E",
+    "SE",
+    "S",
+    "SW",
+    "W",
+    "NW"
+  ],
+  "title_warning": "Radiation warning: elevated values upwind",
+  "title_notable": "Radiation: station notable",
+  "title_calm": "Radiation: calm",
+  "title_all_clear": "Radiation: all clear",
+  "warning_item": "{name}, {km} km upwind, {value} µSv/h, arrives about {eta} after the measurement",
+  "notable_item": "{name}, {value} µSv/h, {km} km {dir}, not upwind",
+  "more": "and {n} more",
+  "calm": "All stations within {km} km are in the normal range."
+}

@@ -48,7 +48,10 @@
           "median_offset": "Mindestabstand über dem Median",
           "sector": "Windsektor",
           "min_wind": "Mindestwindgeschwindigkeit",
-          "max_age": "Maximales Alter der Daten"
+          "max_age": "Maximales Alter der Daten",
+          "notify_services": "Benachrichtigungen senden an",
+          "notify_notable": "Auch bei auffälliger Station benachrichtigen",
+          "notify_all_clear": "Entwarnung senden"
         },
         "data_description": {
           "latitude": "Mittelpunkt der Karte, vorbelegt mit dem Standort von Home Assistant.",
@@ -61,7 +64,10 @@
           "median_offset": "Eine Station ist auffällig, wenn sie über Median mal Faktor und über Median plus Mindestabstand liegt.",
           "sector": "Liegt eine auffällige Station innerhalb dieses Winkels beidseits der Windrichtung, gibt es eine Warnung.",
           "min_wind": "Darunter ist die Windrichtung zu unstet.",
-          "max_age": "Ältere Messwerte werden verworfen."
+          "max_age": "Ältere Messwerte werden verworfen.",
+          "notify_services": "Notify-Dienste, zum Beispiel notify.mobile_app_handy. Leer: keine Benachrichtigungen. Die Entitäten und das Alarm-Ereignis funktionieren trotzdem.",
+          "notify_notable": "Sonst nur bei einer Warnung (auffällige Station im Wind).",
+          "notify_all_clear": "Wenn die Stufe wieder auf ruhig fällt."
         }
       }
     },
@@ -80,6 +86,28 @@
           "calm": "Ruhig",
           "notable": "Auffällig",
           "warning": "Warnung"
+        }
+      },
+      "message": {
+        "name": "Meldung"
+      }
+    },
+    "binary_sensor": {
+      "warning": {
+        "name": "Warnung"
+      }
+    },
+    "event": {
+      "alert": {
+        "name": "Alarm",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "warning": "Warnung",
+              "notable": "Station auffällig",
+              "all_clear": "Entwarnung"
+            }
+          }
         }
       }
     },

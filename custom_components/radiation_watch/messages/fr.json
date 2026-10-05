@@ -1,0 +1,21 @@
+{
+  "decimal_comma": true,
+  "directions": [
+    "N",
+    "NE",
+    "E",
+    "SE",
+    "S",
+    "SO",
+    "O",
+    "NO"
+  ],
+  "title_warning": "Alerte radiation : valeurs élevées au vent",
+  "title_notable": "Radiation : station remarquable",
+  "title_calm": "Radiation : calme",
+  "title_all_clear": "Radiation : fin d'alerte",
+  "warning_item": "{name}, {km} km au vent, {value} µSv/h, arrivée environ {eta} après la mesure",
+  "notable_item": "{name}, {value} µSv/h, {km} km {dir}, pas au vent",
+  "more": "et {n} autres",
+  "calm": "Toutes les stations dans un rayon de {km} km sont dans la plage normale."
+}

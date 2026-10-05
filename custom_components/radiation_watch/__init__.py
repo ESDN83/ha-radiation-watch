@@ -26,6 +26,9 @@ from .const import (
     CONF_MEDIAN_FACTOR,
     CONF_MEDIAN_OFFSET,
     CONF_MIN_WIND,
+    CONF_NOTIFY_ALL_CLEAR,
+    CONF_NOTIFY_NOTABLE,
+    CONF_NOTIFY_SERVICES,
     CONF_RADIUS_FAR,
     CONF_RADIUS_NEAR,
     CONF_SCAN_INTERVAL,
@@ -49,10 +52,11 @@ from .const import (
 )
 from .coordinator import StationCoordinator
 from .mapgen import async_build_maps, maps_current, read_meta
+from .warning import WarningEngine, load_messages
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = [Platform.SENSOR, Platform.BUTTON]
+PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.EVENT, Platform.BUTTON]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 SIGNAL_MAPS_UPDATED = f"{DOMAIN}_maps_updated"
 
@@ -63,6 +67,7 @@ class RuntimeData:
     settings: dict
     map_version: int | None = None
     map_status: str = "missing"  # missing, building, ready, failed
+    engine: WarningEngine | None = None
     tasks: list = field(default_factory=list)
 
 
@@ -86,6 +91,9 @@ def merged_settings(hass: HomeAssistant, entry: ConfigEntry) -> dict:
         "sector": float(c.get(CONF_SECTOR, DEFAULT_SECTOR)),
         "min_wind": float(c.get(CONF_MIN_WIND, DEFAULT_MIN_WIND)),
         "max_age": float(c.get(CONF_MAX_AGE, DEFAULT_MAX_AGE)),
+        "notify_services": list(c.get(CONF_NOTIFY_SERVICES) or []),
+        "notify_notable": bool(c.get(CONF_NOTIFY_NOTABLE, False)),
+        "notify_all_clear": bool(c.get(CONF_NOTIFY_ALL_CLEAR, True)),
     }
 
 
@@ -139,6 +147,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: RadiationWatchConfigEntr
     coordinator = StationCoordinator(hass, entry, settings)
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = RuntimeData(coordinator=coordinator, settings=settings)
+    texts = await hass.async_add_executor_job(load_messages, hass.config.language)
+    entry.runtime_data.engine = WarningEngine(hass, entry, settings, coordinator, texts)
 
     folder = maps_dir(hass)
     current = await hass.async_add_executor_job(
@@ -152,6 +162,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: RadiationWatchConfigEntr
         async_start_map_build(hass, entry)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    # Start after the entities exist, so a warning present at startup reaches the event entity too.
+    entry.runtime_data.engine.async_start()
     entry.async_on_unload(entry.add_update_listener(_async_options_updated))
     return True
 

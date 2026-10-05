@@ -1,0 +1,21 @@
+{
+  "decimal_comma": true,
+  "directions": [
+    "N",
+    "NE",
+    "E",
+    "SE",
+    "S",
+    "SO",
+    "O",
+    "NO"
+  ],
+  "title_warning": "Alerta de radiación: valores elevados a barlovento",
+  "title_notable": "Radiación: estación llamativa",
+  "title_calm": "Radiación: tranquilo",
+  "title_all_clear": "Radiación: fin de la alerta",
+  "warning_item": "{name}, {km} km a barlovento, {value} µSv/h, llega unos {eta} después de la medición",
+  "notable_item": "{name}, {value} µSv/h, {km} km {dir}, no a barlovento",
+  "more": "y {n} más",
+  "calm": "Todas las estaciones en {km} km están en el rango normal."
+}

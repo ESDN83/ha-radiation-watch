@@ -18,6 +18,9 @@ from .const import (
     CONF_MEDIAN_FACTOR,
     CONF_MEDIAN_OFFSET,
     CONF_MIN_WIND,
+    CONF_NOTIFY_ALL_CLEAR,
+    CONF_NOTIFY_NOTABLE,
+    CONF_NOTIFY_SERVICES,
     CONF_RADIUS_FAR,
     CONF_RADIUS_NEAR,
     CONF_SCAN_INTERVAL,
@@ -76,6 +79,19 @@ def _rules_schema(d: dict) -> dict:
     }
 
 
+def _notify_schema(hass, d: dict) -> dict:
+    """Notification targets: any notify service, e.g. notify.mobile_app_phone. Empty = no notifications."""
+    services = sorted(f"notify.{name}" for name in hass.services.async_services_for_domain("notify"))
+    targets = selector.SelectSelector(
+        selector.SelectSelectorConfig(options=services, multiple=True, custom_value=True, mode=selector.SelectSelectorMode.DROPDOWN)
+    )
+    return {
+        vol.Optional(CONF_NOTIFY_SERVICES, default=list(d.get(CONF_NOTIFY_SERVICES) or [])): targets,
+        vol.Required(CONF_NOTIFY_NOTABLE, default=bool(d.get(CONF_NOTIFY_NOTABLE, False))): selector.BooleanSelector(),
+        vol.Required(CONF_NOTIFY_ALL_CLEAR, default=bool(d.get(CONF_NOTIFY_ALL_CLEAR, True))): selector.BooleanSelector(),
+    }
+
+
 def _check(user_input: dict) -> dict[str, str]:
     if user_input[CONF_RADIUS_FAR] <= user_input[CONF_RADIUS_NEAR]:
         return {CONF_RADIUS_FAR: "far_not_larger"}
@@ -110,5 +126,6 @@ class RadiationWatchOptionsFlow(OptionsFlow):
             errors = _check(user_input)
             if not errors:
                 return self.async_create_entry(data=user_input)
-        schema = {**_base_schema(user_input or current), **_rules_schema(user_input or current)}
+        d = user_input or current
+        schema = {**_base_schema(d), **_rules_schema(d), **_notify_schema(self.hass, d)}
         return self.async_show_form(step_id="init", data_schema=vol.Schema(schema), errors=errors)

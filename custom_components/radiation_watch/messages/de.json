@@ -1,0 +1,21 @@
+{
+  "decimal_comma": true,
+  "directions": [
+    "N",
+    "NO",
+    "O",
+    "SO",
+    "S",
+    "SW",
+    "W",
+    "NW"
+  ],
+  "title_warning": "Strahlungswarnung: erhöhte Werte im Wind",
+  "title_notable": "Strahlung: Station auffällig",
+  "title_calm": "Strahlung: ruhig",
+  "title_all_clear": "Strahlung: Entwarnung",
+  "warning_item": "{name}, {km} km im Wind, {value} µSv/h, Ankunft ca. {eta} nach der Messung",
+  "notable_item": "{name}, {value} µSv/h, {km} km {dir}, nicht im Wind",
+  "more": "und {n} weitere",
+  "calm": "Alle Stationen bis {km} km im normalen Bereich."
+}

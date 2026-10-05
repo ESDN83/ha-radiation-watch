@@ -48,7 +48,10 @@
           "median_offset": "Écart minimal au-dessus de la médiane",
           "sector": "Secteur du vent",
           "min_wind": "Vitesse de vent minimale",
-          "max_age": "Âge maximal des données"
+          "max_age": "Âge maximal des données",
+          "notify_services": "Envoyer les notifications à",
+          "notify_notable": "Notifier aussi une station remarquable",
+          "notify_all_clear": "Notifier la fin d'alerte"
         },
         "data_description": {
           "latitude": "Centre de la carte, par défaut l'emplacement de Home Assistant.",
@@ -61,7 +64,10 @@
           "median_offset": "Une station est remarquable si elle dépasse médiane x facteur et médiane + écart minimal.",
           "sector": "Une station remarquable dans cet angle de part et d'autre de la direction du vent déclenche une alerte.",
           "min_wind": "En dessous, la direction du vent est trop instable.",
-          "max_age": "Les mesures plus anciennes sont ignorées."
+          "max_age": "Les mesures plus anciennes sont ignorées.",
+          "notify_services": "Services notify, par exemple notify.mobile_app_telephone. Vide : pas de notifications. Les entités et l'événement fonctionnent quand même.",
+          "notify_notable": "Sinon uniquement en cas d'alerte (station remarquable au vent).",
+          "notify_all_clear": "Quand le niveau redevient calme."
         }
       }
     },
@@ -80,6 +86,28 @@
           "calm": "Calme",
           "notable": "Remarquable",
           "warning": "Alerte"
+        }
+      },
+      "message": {
+        "name": "Message"
+      }
+    },
+    "binary_sensor": {
+      "warning": {
+        "name": "Alerte"
+      }
+    },
+    "event": {
+      "alert": {
+        "name": "Alarme",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "warning": "Alerte",
+              "notable": "Station remarquable",
+              "all_clear": "Fin d'alerte"
+            }
+          }
         }
       }
     },

@@ -1,19 +1,19 @@
-"""Sensors: station list and early warning."""
+"""Sensors: station list, early warning level and ready-made message text."""
 
 from __future__ import annotations
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
-from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State, callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import SIGNAL_MAPS_UPDATED, RadiationWatchConfigEntry
 from .const import ATTRIBUTION_DATA, ATTRIBUTION_MAP, DOMAIN, URL_MAPS, VERSION, WARNING_STATES
 from .coordinator import StationCoordinator
-from .geo import Rules, evaluate, to_kmh
+from .warning import SIGNAL_EVALUATED
 
 
 def device_info(entry: RadiationWatchConfigEntry) -> DeviceInfo:
@@ -31,7 +31,7 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: RadiationWatchConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
 ) -> None:
     stations = StationsSensor(entry)
-    async_add_entities([stations, EarlyWarningSensor(entry, stations)])
+    async_add_entities([stations, EarlyWarningSensor(entry, stations), MessageSensor(entry)])
 
 
 class StationsSensor(CoordinatorEntity[StationCoordinator], SensorEntity):
@@ -66,10 +66,35 @@ class StationsSensor(CoordinatorEntity[StationCoordinator], SensorEntity):
         }
 
 
-class EarlyWarningSensor(CoordinatorEntity[StationCoordinator], SensorEntity):
-    """calm / notable / warning. Everything the card needs is in the attributes."""
+class EngineEntity(Entity):
+    """Base for entities that show the shared early warning evaluation."""
 
     _attr_has_entity_name = True
+    _attr_should_poll = False
+
+    def __init__(self, entry: RadiationWatchConfigEntry, key: str, entity_id: str) -> None:
+        self._entry = entry
+        self._attr_unique_id = f"{entry.entry_id}_{key}"
+        self.entity_id = entity_id
+        self._attr_device_info = device_info(entry)
+
+    @property
+    def engine(self):
+        return self._entry.runtime_data.engine
+
+    async def async_added_to_hass(self) -> None:
+        self.async_on_remove(
+            async_dispatcher_connect(self.hass, f"{SIGNAL_EVALUATED}_{self._entry.entry_id}", self.async_write_ha_state)
+        )
+
+    @property
+    def available(self) -> bool:
+        return self.engine.state.result is not None
+
+
+class EarlyWarningSensor(EngineEntity, SensorEntity):
+    """calm / notable / warning. Everything the card needs is in the attributes."""
+
     _attr_translation_key = "early_warning"
     _attr_device_class = SensorDeviceClass.ENUM
     _attr_options = WARNING_STATES
@@ -77,92 +102,68 @@ class EarlyWarningSensor(CoordinatorEntity[StationCoordinator], SensorEntity):
     _unrecorded_attributes = frozenset({"notable", "maps", "rules", "radius_near", "radius_far", "home"})
 
     def __init__(self, entry: RadiationWatchConfigEntry, stations: StationsSensor) -> None:
-        super().__init__(entry.runtime_data.coordinator)
-        self._entry = entry
+        super().__init__(entry, "early_warning", "sensor.radiation_watch_early_warning")
         self._stations_sensor = stations
-        self._attr_unique_id = f"{entry.entry_id}_early_warning"
-        self.entity_id = "sensor.radiation_watch_early_warning"
-        self._attr_device_info = device_info(entry)
-        self._attrs: dict = {}
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
-        s = self._entry.runtime_data.settings
-        wind = [e for e in (s["wind_entity"], s["wind_fallback"]) if e]
-        if wind:
-            self.async_on_remove(async_track_state_change_event(self.hass, wind, self._wind_changed))
         self.async_on_remove(async_dispatcher_connect(self.hass, SIGNAL_MAPS_UPDATED, self._maps_changed))
-        self._recalc()
-
-    @callback
-    def _wind_changed(self, event: Event[EventStateChangedData]) -> None:
-        self._recalc()
-        self.async_write_ha_state()
 
     @callback
     def _maps_changed(self) -> None:
-        self._recalc()
         self.async_write_ha_state()
 
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        self._recalc()
-        super()._handle_coordinator_update()
+    @property
+    def native_value(self) -> str | None:
+        r = self.engine.state.result
+        return r.state if r else None
 
-    def _wind(self) -> tuple[float | None, float | None, str | None]:
-        """Bearing (where the wind comes from) and speed in km/h from the first usable weather entity."""
-        s = self._entry.runtime_data.settings
-        for entity_id in (s["wind_entity"], s["wind_fallback"]):
-            if not entity_id:
-                continue
-            st: State | None = self.hass.states.get(entity_id)
-            if st is None:
-                continue
-            bearing = st.attributes.get("wind_bearing")
-            speed = st.attributes.get("wind_speed")
-            if isinstance(bearing, (int, float)) and isinstance(speed, (int, float)):
-                return float(bearing), to_kmh(float(speed), st.attributes.get("wind_speed_unit")), entity_id
-        return None, None, None
-
-    def _recalc(self) -> None:
+    @property
+    def extra_state_attributes(self) -> dict:
         rd = self._entry.runtime_data
         s = rd.settings
-        rules = Rules(s["abs_threshold"], s["median_factor"], s["median_offset"], s["sector"], s["min_wind"])
-        bearing, kmh, source = self._wind()
-        result = evaluate(self.coordinator.data.stations, s["latitude"], s["longitude"], bearing, kmh, rules)
-        self._attr_native_value = result.state
+        st = rd.engine.state
+        r = st.result
         maps = None
         if rd.map_status == "ready" and rd.map_version:
             maps = {
-                f"{n}_{st}": f"{URL_MAPS}/{n}_{st}.jpg?v={rd.map_version}"
-                for n in ("near", "far")
-                for st in ("light", "dark")
+                f"{n}_{v}": f"{URL_MAPS}/{n}_{v}.jpg?v={rd.map_version}" for n in ("near", "far") for v in ("light", "dark")
             }
-        self._attrs = {
-            "wind_bearing": bearing,
-            "wind_speed_kmh": round(kmh, 1) if kmh is not None else None,
-            "wind_source": source,
-            "median": result.median,
-            "limit": result.limit,
-            "notable_count": len(result.notable),
-            "upwind": result.upwind[:10],
-            "notable": result.notable[:30],
+        return {
+            "wind_bearing": st.wind_bearing,
+            "wind_speed_kmh": round(st.wind_kmh, 1) if st.wind_kmh is not None else None,
+            "wind_source": st.wind_source,
+            "median": r.median if r else None,
+            "limit": r.limit if r else None,
+            "notable_count": len(r.notable) if r else 0,
+            "upwind": r.upwind[:10] if r else [],
+            "notable": r.notable[:30] if r else [],
+            "message": st.message,
             "stations_entity": self._stations_sensor.entity_id,
             "home": [s["latitude"], s["longitude"]],
             "radius_near": s["radius_near"],
             "radius_far": s["radius_far"],
-            "rules": {
-                "abs_threshold": s["abs_threshold"],
-                "median_factor": s["median_factor"],
-                "median_offset": s["median_offset"],
-                "sector": s["sector"],
-                "min_wind": s["min_wind"],
-            },
+            "rules": {k: s[k] for k in ("abs_threshold", "median_factor", "median_offset", "sector", "min_wind")},
             "maps": maps,
             "map_status": rd.map_status,
-            "fetched_at": self.coordinator.data.fetched_at.isoformat(),
+            "fetched_at": self._entry.runtime_data.coordinator.data.fetched_at.isoformat(),
         }
+
+
+class MessageSensor(EngineEntity, SensorEntity):
+    """Ready-made text in the HA language, for notifications, TTS or a dashboard line."""
+
+    _attr_translation_key = "message"
+    _attr_icon = "mdi:message-alert-outline"
+
+    def __init__(self, entry: RadiationWatchConfigEntry) -> None:
+        super().__init__(entry, "message", "sensor.radiation_watch_message")
+
+    @property
+    def native_value(self) -> str:
+        return self.engine.state.message[:255]
 
     @property
     def extra_state_attributes(self) -> dict:
-        return self._attrs
+        r = self.engine.state.result
+        return {"title": self.engine.state.title, "level": r.state if r else None}

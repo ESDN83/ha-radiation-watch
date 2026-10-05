@@ -9,6 +9,10 @@ from pathlib import Path
 
 TEXT = {
     "en": dict(
+        bs="Warning", msg="Message", alert="Alert", ev_warning="Warning", ev_notable="Station notable", ev_clear="All clear",
+        n_svc="Send notifications to", n_notable="Also notify when a station is notable", n_clear="Notify the all clear",
+        d_n_svc="Notify services, for example notify.mobile_app_phone. Empty: no notifications. The entities and the alert event work either way.",
+        d_n_notable="Otherwise only for a warning (notable station upwind).", d_n_clear="When the level goes back to calm.",
         title="Radiation Watch",
         desc="Dose rate stations around your home (German BfS network and European EURDEP), wind based early warning and a map card. Map tiles are downloaded once from OpenStreetMap and then served locally.",
         lat="Latitude", lon="Longitude", near="Near radius", far="Far radius", wind="Weather entity for wind", wfb="Fallback weather entity", scan="Update interval",
@@ -25,6 +29,10 @@ TEXT = {
         st="Stations", ew="Early warning", calm="Calm", notable="Notable", warning="Warning", btn="Regenerate map",
     ),
     "de": dict(
+        bs="Warnung", msg="Meldung", alert="Alarm", ev_warning="Warnung", ev_notable="Station auffällig", ev_clear="Entwarnung",
+        n_svc="Benachrichtigungen senden an", n_notable="Auch bei auffälliger Station benachrichtigen", n_clear="Entwarnung senden",
+        d_n_svc="Notify-Dienste, zum Beispiel notify.mobile_app_handy. Leer: keine Benachrichtigungen. Die Entitäten und das Alarm-Ereignis funktionieren trotzdem.",
+        d_n_notable="Sonst nur bei einer Warnung (auffällige Station im Wind).", d_n_clear="Wenn die Stufe wieder auf ruhig fällt.",
         title="Radiation Watch",
         desc="Messstationen der Ortsdosisleistung rund um dein Zuhause (BfS-Messnetz und europäisches EURDEP), Frühwarnung nach Windrichtung und eine Kartenkarte. Die Kartenkacheln werden einmalig von OpenStreetMap geladen und danach lokal ausgeliefert.",
         lat="Breitengrad", lon="Längengrad", near="Radius Nah", far="Radius Weit", wind="Wetter-Entität für den Wind", wfb="Ersatz-Wetter-Entität", scan="Abrufintervall",
@@ -41,6 +49,10 @@ TEXT = {
         st="Stationen", ew="Frühwarnung", calm="Ruhig", notable="Auffällig", warning="Warnung", btn="Karte neu erzeugen",
     ),
     "fr": dict(
+        bs="Alerte", msg="Message", alert="Alarme", ev_warning="Alerte", ev_notable="Station remarquable", ev_clear="Fin d'alerte",
+        n_svc="Envoyer les notifications à", n_notable="Notifier aussi une station remarquable", n_clear="Notifier la fin d'alerte",
+        d_n_svc="Services notify, par exemple notify.mobile_app_telephone. Vide : pas de notifications. Les entités et l'événement fonctionnent quand même.",
+        d_n_notable="Sinon uniquement en cas d'alerte (station remarquable au vent).", d_n_clear="Quand le niveau redevient calme.",
         title="Radiation Watch",
         desc="Stations de débit de dose autour de votre domicile (réseau allemand BfS et réseau européen EURDEP), alerte précoce selon le vent et une carte. Les tuiles OpenStreetMap sont téléchargées une seule fois puis servies localement.",
         lat="Latitude", lon="Longitude", near="Rayon proche", far="Rayon lointain", wind="Entité météo pour le vent", wfb="Entité météo de secours", scan="Intervalle de mise à jour",
@@ -57,6 +69,10 @@ TEXT = {
         st="Stations", ew="Alerte précoce", calm="Calme", notable="Remarquable", warning="Alerte", btn="Régénérer la carte",
     ),
     "es": dict(
+        bs="Alerta", msg="Mensaje", alert="Alarma", ev_warning="Alerta", ev_notable="Estación llamativa", ev_clear="Fin de la alerta",
+        n_svc="Enviar notificaciones a", n_notable="Notificar también una estación llamativa", n_clear="Notificar el fin de la alerta",
+        d_n_svc="Servicios notify, por ejemplo notify.mobile_app_telefono. Vacío: sin notificaciones. Las entidades y el evento funcionan igualmente.",
+        d_n_notable="Si no, solo en caso de alerta (estación llamativa a barlovento).", d_n_clear="Cuando el nivel vuelve a tranquilo.",
         title="Radiation Watch",
         desc="Estaciones de tasa de dosis alrededor de su hogar (red alemana BfS y red europea EURDEP), alerta temprana según el viento y una tarjeta de mapa. Los mosaicos de OpenStreetMap se descargan una sola vez y luego se sirven localmente.",
         lat="Latitud", lon="Longitud", near="Radio cercano", far="Radio lejano", wind="Entidad meteorológica para el viento", wfb="Entidad meteorológica de reserva", scan="Intervalo de actualización",
@@ -82,6 +98,8 @@ def build(t: dict) -> dict:
                  "wind_entity": t["d_wind"], "wind_fallback": t["d_wfb"]}
     rules_data = {"abs_threshold": t["abs"], "median_factor": t["fac"], "median_offset": t["off"],
                   "sector": t["sec"], "min_wind": t["minw"], "max_age": t["age"]}
+    notify_data = {"notify_services": t["n_svc"], "notify_notable": t["n_notable"], "notify_all_clear": t["n_clear"]}
+    notify_desc = {"notify_services": t["d_n_svc"], "notify_notable": t["d_n_notable"], "notify_all_clear": t["d_n_clear"]}
     rules_desc = {"abs_threshold": t["d_abs"], "median_factor": t["d_fac"], "median_offset": t["d_fac"],
                   "sector": t["d_sec"], "min_wind": t["d_minw"], "max_age": t["d_age"]}
     return {
@@ -92,14 +110,19 @@ def build(t: dict) -> dict:
         },
         "options": {
             "step": {"init": {"title": t["opt_title"], "description": t["opt_desc"],
-                              "data": {**base_data, **rules_data}, "data_description": {**base_desc, **rules_desc}}},
+                              "data": {**base_data, **rules_data, **notify_data},
+                              "data_description": {**base_desc, **rules_desc, **notify_desc}}},
             "error": {"far_not_larger": t["err_far"]},
         },
         "entity": {
             "sensor": {
                 "stations": {"name": t["st"]},
                 "early_warning": {"name": t["ew"], "state": {"calm": t["calm"], "notable": t["notable"], "warning": t["warning"]}},
+                "message": {"name": t["msg"]},
             },
+            "binary_sensor": {"warning": {"name": t["bs"]}},
+            "event": {"alert": {"name": t["alert"], "state_attributes": {"event_type": {"state": {
+                "warning": t["ev_warning"], "notable": t["ev_notable"], "all_clear": t["ev_clear"]}}}}},
             "button": {"regenerate_map": {"name": t["btn"]}},
         },
     }

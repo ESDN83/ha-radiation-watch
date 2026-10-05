@@ -4,6 +4,19 @@
 
 Ambient dose rate stations around your home on a map, with a wind based early warning.
 
+<table>
+  <tr>
+    <td width="50%"><img src="docs/card_near.jpg" alt="Near view with live data"></td>
+    <td width="50%"><img src="docs/card_warning_simulated.jpg" alt="Far view, simulated warning"></td>
+  </tr>
+  <tr>
+    <td><b>Near view</b>, live data: German BfS stations plus the Dutch and Belgian ones near the border,
+      wind from the west with travel time arcs (1 h to 4 h).</td>
+    <td><b>Far view, simulated</b>: elevated values around Huy/Tihange (BE) while the wind blows from
+      there. The stations get red rings, the card lists the estimated arrival times.</td>
+  </tr>
+</table>
+
 - Pulls the latest values of all stations within a radius you choose (default 120 km) from the open
   WFS service of the German Federal Office for Radiation Protection (BfS). It covers the German ODL
   network and the European **EURDEP** exchange (Belgium, Netherlands, Luxembourg, France and more).

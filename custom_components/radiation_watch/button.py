@@ -26,6 +26,7 @@ class RegenerateMapButton(ButtonEntity):
     def __init__(self, entry: RadiationWatchConfigEntry) -> None:
         self._entry = entry
         self._attr_unique_id = f"{entry.entry_id}_regenerate_map"
+        self.entity_id = "button.radiation_watch_regenerate_map"
         self._attr_device_info = device_info(entry)
 
     async def async_press(self) -> None:

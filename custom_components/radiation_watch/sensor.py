@@ -48,6 +48,8 @@ class StationsSensor(CoordinatorEntity[StationCoordinator], SensorEntity):
     def __init__(self, entry: RadiationWatchConfigEntry) -> None:
         super().__init__(entry.runtime_data.coordinator)
         self._attr_unique_id = f"{entry.entry_id}_stations"
+        # Fixed English entity_id, otherwise it follows the UI language (sensor.radiation_watch_stationen ...).
+        self.entity_id = "sensor.radiation_watch_stations"
         self._attr_device_info = device_info(entry)
 
     @property
@@ -79,6 +81,7 @@ class EarlyWarningSensor(CoordinatorEntity[StationCoordinator], SensorEntity):
         self._entry = entry
         self._stations_sensor = stations
         self._attr_unique_id = f"{entry.entry_id}_early_warning"
+        self.entity_id = "sensor.radiation_watch_early_warning"
         self._attr_device_info = device_info(entry)
         self._attrs: dict = {}
 

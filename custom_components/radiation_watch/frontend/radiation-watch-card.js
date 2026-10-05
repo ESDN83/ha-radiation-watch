@@ -13,18 +13,19 @@
 const CARD_VERSION = "0.1.0";
 const BASE = "/radiation_watch_files/frontend";
 const LOCALES = {};
+const LOADING = {};
 const STORAGE_KEY = "radiation-watch-card-view";
 
-async function loadLocale(lang) {
-  if (LOCALES[lang] !== undefined) return LOCALES[lang];
-  LOCALES[lang] = null;
-  try {
-    const r = await fetch(`${BASE}/locales/${lang}.json?v=${CARD_VERSION}`);
-    LOCALES[lang] = r.ok ? await r.json() : null;
-  } catch (e) {
-    LOCALES[lang] = null;
+// One shared promise per language: a second card on the page waits for the same download
+// instead of seeing an empty entry and rendering the raw keys.
+function loadLocale(lang) {
+  if (!LOADING[lang]) {
+    LOADING[lang] = fetch(`${BASE}/locales/${lang}.json?v=${CARD_VERSION}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null)
+      .then((j) => (LOCALES[lang] = j));
   }
-  return LOCALES[lang];
+  return LOADING[lang];
 }
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

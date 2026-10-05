@@ -37,10 +37,11 @@ from .const import (
 )
 
 
-def _num(min_: float, max_: float, step: float, unit: str | None = None) -> selector.NumberSelector:
-    return selector.NumberSelector(
-        selector.NumberSelectorConfig(min=min_, max=max_, step=step, unit_of_measurement=unit, mode=selector.NumberSelectorMode.BOX)
-    )
+def _num(min_: float, max_: float, step: float | str, unit: str | None = None) -> selector.NumberSelector:
+    cfg = selector.NumberSelectorConfig(min=min_, max=max_, step=step, mode=selector.NumberSelectorMode.BOX)
+    if unit:  # the selector rejects an empty unit
+        cfg["unit_of_measurement"] = unit
+    return selector.NumberSelector(cfg)
 
 
 WEATHER = selector.EntitySelector(selector.EntitySelectorConfig(domain="weather"))
@@ -49,8 +50,8 @@ WEATHER = selector.EntitySelector(selector.EntitySelectorConfig(domain="weather"
 def _base_schema(d: dict) -> dict:
     """Location, radii, wind and polling. Shared by setup and options."""
     schema: dict = {
-        vol.Required(CONF_LATITUDE, default=d[CONF_LATITUDE]): _num(-90, 90, 0.00001),
-        vol.Required(CONF_LONGITUDE, default=d[CONF_LONGITUDE]): _num(-180, 180, 0.00001),
+        vol.Required(CONF_LATITUDE, default=d[CONF_LATITUDE]): _num(-90, 90, "any"),
+        vol.Required(CONF_LONGITUDE, default=d[CONF_LONGITUDE]): _num(-180, 180, "any"),
         vol.Required(CONF_RADIUS_NEAR, default=d.get(CONF_RADIUS_NEAR, DEFAULT_RADIUS_NEAR)): _num(10, 100, 5, "km"),
         vol.Required(CONF_RADIUS_FAR, default=d.get(CONF_RADIUS_FAR, DEFAULT_RADIUS_FAR)): _num(40, 300, 10, "km"),
     }
@@ -85,8 +86,8 @@ class RadiationWatchConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        await self.async_set_unique_id(DOMAIN)
-        self._abort_if_unique_id_configured()
+        # One instance only: handled by "single_config_entry" in manifest.json. A unique_id here
+        # would block a second attempt with "already_in_progress" after an aborted first one.
         errors: dict[str, str] = {}
         if user_input is not None:
             errors = _check(user_input)

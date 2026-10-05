@@ -1,0 +1,47 @@
+{
+  "directions": ["N", "NE", "E", "SE", "S", "SO", "O", "NO"],
+  "view": { "near": "Proche : {km} km", "far": "Lointain : {km} km" },
+  "stations": "{n} stations",
+  "tap": { "to_far": "Touchez pour la vue lointaine.", "to_near": "Touchez pour la vue proche." },
+  "wind": {
+    "from": "Vent du {dir}",
+    "hint": "Le secteur coloré montre les stations dont l'air se dirige vers vous, les arcs le temps qu'il lui faut pour arriver.",
+    "none": "Vent trop faible ou pas de données : aucune direction."
+  },
+  "home": "Domicile (carré, moyenne 1 h)",
+  "no_value": "sans valeur",
+  "median": "Médiane {median} µSv/h, remarquable à partir de {limit} µSv/h.",
+  "legend": {
+    "below": "moins de {v}",
+    "from": "à partir de {v}",
+    "rings": "Anneau jaune : remarquable. Anneau rouge : remarquable et au vent."
+  },
+  "eta": "{name}, {km} km au vent : arrivée environ {eta} après la mesure.",
+  "eta_note": "Les valeurs ont jusqu'à 1,5 h (EURDEP environ 2 h), l'arrivée peut donc être plus tôt.",
+  "map_building": "Les images de la carte sont en cours de création, cela prend environ une minute.",
+  "attribution": "Carte © contributeurs OpenStreetMap · Données BfS, EURDEP",
+  "status": {
+    "calm": { "title": "Alerte précoce : calme", "text": "Toutes les stations dans un rayon de {km} km sont dans la plage normale." },
+    "notable": { "title": "Alerte précoce : station remarquable", "text": "Le vent ne vient pas de sa direction. Surveillez la carte." },
+    "warning": { "title": "Alerte précoce : radiation élevée au vent", "text": "Une station du côté du vent mesure nettement plus que les autres. Heure d'arrivée sous la carte. Fermez les fenêtres, suivez votre plan d'urgence." },
+    "unknown": { "title": "Alerte précoce : pas de données", "text": "Vérifiez l'intégration Radiation Watch." },
+    "unavailable": { "title": "Alerte précoce : pas de données", "text": "Vérifiez l'intégration Radiation Watch." }
+  },
+  "errors": { "no_entity": "Radiation Watch : capteur d'alerte introuvable. Configurez-le dans Paramètres > Appareils et services." },
+  "editor": {
+    "entity": "Capteur d'alerte précoce",
+    "local_sensors": "Points de mesure propres (µSv/h)",
+    "start_view": "Vue de départ",
+    "map_style": "Style de carte",
+    "warn_threshold": "Jaune à partir de",
+    "danger_threshold": "Rouge à partir de",
+    "color_ok": "Couleur normale",
+    "color_warn": "Couleur élevée",
+    "color_danger": "Couleur haute",
+    "color_wind": "Couleur du vent",
+    "show_status": "Bandeau d'état",
+    "show_legend": "Légende",
+    "show_names": "Noms des stations",
+    "show_values": "Valeurs des stations"
+  }
+}

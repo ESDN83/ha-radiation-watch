@@ -1,0 +1,92 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Radiation Watch",
+        "description": "Dose rate stations around your home (German BfS network and European EURDEP), wind based early warning and a map card. Map tiles are downloaded once from OpenStreetMap and then served locally.",
+        "data": {
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "radius_near": "Near radius",
+          "radius_far": "Far radius",
+          "wind_entity": "Weather entity for wind",
+          "wind_fallback": "Fallback weather entity",
+          "scan_interval": "Update interval"
+        },
+        "data_description": {
+          "latitude": "Centre of the map, defaults to your Home Assistant location.",
+          "radius_near": "Radius of the near view.",
+          "radius_far": "Radius of the far view and of the station search. Stations further away are ignored.",
+          "wind_entity": "Provides wind direction and speed (attributes wind_bearing and wind_speed).",
+          "wind_fallback": "Used when the first one has no wind data."
+        }
+      }
+    },
+    "error": {
+      "far_not_larger": "The far radius must be larger than the near radius."
+    },
+    "abort": {
+      "already_configured": "Radiation Watch is already set up.",
+      "single_instance_allowed": "Radiation Watch is already set up."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Radiation Watch options",
+        "description": "Changing location or radii rebuilds the map images.",
+        "data": {
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "radius_near": "Near radius",
+          "radius_far": "Far radius",
+          "wind_entity": "Weather entity for wind",
+          "wind_fallback": "Fallback weather entity",
+          "scan_interval": "Update interval",
+          "abs_threshold": "Absolute threshold",
+          "median_factor": "Factor above median",
+          "median_offset": "Minimum distance above median",
+          "sector": "Wind sector",
+          "min_wind": "Minimum wind speed",
+          "max_age": "Maximum data age"
+        },
+        "data_description": {
+          "latitude": "Centre of the map, defaults to your Home Assistant location.",
+          "radius_near": "Radius of the near view.",
+          "radius_far": "Radius of the far view and of the station search. Stations further away are ignored.",
+          "wind_entity": "Provides wind direction and speed (attributes wind_bearing and wind_speed).",
+          "wind_fallback": "Used when the first one has no wind data.",
+          "abs_threshold": "A station at or above this value is always notable.",
+          "median_factor": "A station is notable when it is above median x factor and above median + minimum distance.",
+          "median_offset": "A station is notable when it is above median x factor and above median + minimum distance.",
+          "sector": "A notable station within this angle either side of the wind direction raises a warning.",
+          "min_wind": "Below this the wind direction is too unsteady to be used.",
+          "max_age": "Older measurements are dropped."
+        }
+      }
+    },
+    "error": {
+      "far_not_larger": "The far radius must be larger than the near radius."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "stations": {
+        "name": "Stations"
+      },
+      "early_warning": {
+        "name": "Early warning",
+        "state": {
+          "calm": "Calm",
+          "notable": "Notable",
+          "warning": "Warning"
+        }
+      }
+    },
+    "button": {
+      "regenerate_map": {
+        "name": "Regenerate map"
+      }
+    }
+  }
+}

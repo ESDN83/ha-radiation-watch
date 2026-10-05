@@ -1,0 +1,92 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Radiation Watch",
+        "description": "Stations de débit de dose autour de votre domicile (réseau allemand BfS et réseau européen EURDEP), alerte précoce selon le vent et une carte. Les tuiles OpenStreetMap sont téléchargées une seule fois puis servies localement.",
+        "data": {
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "radius_near": "Rayon proche",
+          "radius_far": "Rayon lointain",
+          "wind_entity": "Entité météo pour le vent",
+          "wind_fallback": "Entité météo de secours",
+          "scan_interval": "Intervalle de mise à jour"
+        },
+        "data_description": {
+          "latitude": "Centre de la carte, par défaut l'emplacement de Home Assistant.",
+          "radius_near": "Rayon de la vue proche.",
+          "radius_far": "Rayon de la vue lointaine et de la recherche des stations. Les stations plus éloignées sont ignorées.",
+          "wind_entity": "Fournit la direction et la vitesse du vent (attributs wind_bearing et wind_speed).",
+          "wind_fallback": "Utilisée si la première n'a pas de données de vent."
+        }
+      }
+    },
+    "error": {
+      "far_not_larger": "Le rayon lointain doit être plus grand que le rayon proche."
+    },
+    "abort": {
+      "already_configured": "Radiation Watch est déjà configuré.",
+      "single_instance_allowed": "Radiation Watch est déjà configuré."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options de Radiation Watch",
+        "description": "Modifier l'emplacement ou les rayons régénère les images de la carte.",
+        "data": {
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "radius_near": "Rayon proche",
+          "radius_far": "Rayon lointain",
+          "wind_entity": "Entité météo pour le vent",
+          "wind_fallback": "Entité météo de secours",
+          "scan_interval": "Intervalle de mise à jour",
+          "abs_threshold": "Seuil absolu",
+          "median_factor": "Facteur au-dessus de la médiane",
+          "median_offset": "Écart minimal au-dessus de la médiane",
+          "sector": "Secteur du vent",
+          "min_wind": "Vitesse de vent minimale",
+          "max_age": "Âge maximal des données"
+        },
+        "data_description": {
+          "latitude": "Centre de la carte, par défaut l'emplacement de Home Assistant.",
+          "radius_near": "Rayon de la vue proche.",
+          "radius_far": "Rayon de la vue lointaine et de la recherche des stations. Les stations plus éloignées sont ignorées.",
+          "wind_entity": "Fournit la direction et la vitesse du vent (attributs wind_bearing et wind_speed).",
+          "wind_fallback": "Utilisée si la première n'a pas de données de vent.",
+          "abs_threshold": "Une station à partir de cette valeur est toujours remarquable.",
+          "median_factor": "Une station est remarquable si elle dépasse médiane x facteur et médiane + écart minimal.",
+          "median_offset": "Une station est remarquable si elle dépasse médiane x facteur et médiane + écart minimal.",
+          "sector": "Une station remarquable dans cet angle de part et d'autre de la direction du vent déclenche une alerte.",
+          "min_wind": "En dessous, la direction du vent est trop instable.",
+          "max_age": "Les mesures plus anciennes sont ignorées."
+        }
+      }
+    },
+    "error": {
+      "far_not_larger": "Le rayon lointain doit être plus grand que le rayon proche."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "stations": {
+        "name": "Stations"
+      },
+      "early_warning": {
+        "name": "Alerte précoce",
+        "state": {
+          "calm": "Calme",
+          "notable": "Remarquable",
+          "warning": "Alerte"
+        }
+      }
+    },
+    "button": {
+      "regenerate_map": {
+        "name": "Régénérer la carte"
+      }
+    }
+  }
+}

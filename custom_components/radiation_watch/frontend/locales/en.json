@@ -1,0 +1,47 @@
+{
+  "directions": ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
+  "view": { "near": "Near: {km} km", "far": "Far: {km} km" },
+  "stations": "{n} stations",
+  "tap": { "to_far": "Tap for the far view.", "to_near": "Tap for the near view." },
+  "wind": {
+    "from": "Wind from {dir}",
+    "hint": "The shaded sector shows the stations whose air is heading towards you, the arcs how long it takes to get here.",
+    "none": "Wind too weak or no wind data: no direction."
+  },
+  "home": "Home (square, 1 h mean)",
+  "no_value": "no value",
+  "median": "Median {median} µSv/h, notable from {limit} µSv/h.",
+  "legend": {
+    "below": "below {v}",
+    "from": "from {v}",
+    "rings": "Yellow ring: notable. Red ring: notable and upwind."
+  },
+  "eta": "{name}, {km} km upwind: arrives about {eta} after the measurement.",
+  "eta_note": "Values are up to 1.5 h old (EURDEP about 2 h), so it may arrive earlier.",
+  "map_building": "Map images are being built, this takes a minute.",
+  "attribution": "Map © OpenStreetMap contributors · Data BfS, EURDEP",
+  "status": {
+    "calm": { "title": "Early warning: calm", "text": "All stations within {km} km are in the normal range." },
+    "notable": { "title": "Early warning: station notable", "text": "The wind does not come from its direction. Keep an eye on the map." },
+    "warning": { "title": "Early warning: elevated radiation upwind", "text": "A station on the windward side measures clearly more than the others. Arrival time below the map. Close the windows, follow your emergency plan." },
+    "unknown": { "title": "Early warning: no data", "text": "Check the Radiation Watch integration." },
+    "unavailable": { "title": "Early warning: no data", "text": "Check the Radiation Watch integration." }
+  },
+  "errors": { "no_entity": "Radiation Watch: early warning sensor not found. Set it up under Settings > Devices & services." },
+  "editor": {
+    "entity": "Early warning sensor",
+    "local_sensors": "Own measuring points (µSv/h)",
+    "start_view": "Start view",
+    "map_style": "Map style",
+    "warn_threshold": "Yellow from",
+    "danger_threshold": "Red from",
+    "color_ok": "Colour normal",
+    "color_warn": "Colour elevated",
+    "color_danger": "Colour high",
+    "color_wind": "Colour wind",
+    "show_status": "Status banner",
+    "show_legend": "Legend",
+    "show_names": "Station names",
+    "show_values": "Station values"
+  }
+}

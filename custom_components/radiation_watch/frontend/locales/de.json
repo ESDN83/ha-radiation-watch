@@ -1,0 +1,47 @@
+{
+  "directions": ["N", "NO", "O", "SO", "S", "SW", "W", "NW"],
+  "view": { "near": "Nah: {km} km", "far": "Weit: {km} km" },
+  "stations": "{n} Stationen",
+  "tap": { "to_far": "Antippen für die Weit-Ansicht.", "to_near": "Antippen für die Nah-Ansicht." },
+  "wind": {
+    "from": "Wind aus {dir}",
+    "hint": "Der blaue Bereich zeigt die Stationen, deren Luft zu uns zieht, die Bögen, wie lange sie bis hierher braucht.",
+    "none": "Wind zu schwach oder ohne Daten: keine Zugrichtung."
+  },
+  "home": "Haus (Quadrat, 1h-Mittel)",
+  "no_value": "ohne Wert",
+  "median": "Median {median} µSv/h, auffällig ab {limit} µSv/h.",
+  "legend": {
+    "below": "unter {v}",
+    "from": "ab {v}",
+    "rings": "Gelber Ring: auffällig. Roter Ring: auffällig und im Wind."
+  },
+  "eta": "{name}, {km} km im Wind: Ankunft ca. {eta} nach der Messung.",
+  "eta_note": "Die Werte sind bis zu 1,5 h alt (EURDEP eher 2 h), die Ankunft kann also früher sein.",
+  "map_building": "Die Kartenbilder werden erzeugt, das dauert etwa eine Minute.",
+  "attribution": "Karte © OpenStreetMap-Mitwirkende · Daten BfS, EURDEP",
+  "status": {
+    "calm": { "title": "Frühwarnung: ruhig", "text": "Alle Stationen bis {km} km im normalen Bereich." },
+    "notable": { "title": "Frühwarnung: Station auffällig", "text": "Der Wind kommt nicht aus ihrer Richtung. Karte beobachten." },
+    "warning": { "title": "Frühwarnung: erhöhte Strahlung im Wind", "text": "Eine Station auf der Windseite misst deutlich mehr als die übrigen. Ankunftszeit unter der Karte. Fenster zu, Notfallplan." },
+    "unknown": { "title": "Frühwarnung: keine Daten", "text": "Integration Radiation Watch prüfen." },
+    "unavailable": { "title": "Frühwarnung: keine Daten", "text": "Integration Radiation Watch prüfen." }
+  },
+  "errors": { "no_entity": "Radiation Watch: Frühwarn-Sensor nicht gefunden. Unter Einstellungen > Geräte & Dienste einrichten." },
+  "editor": {
+    "entity": "Frühwarn-Sensor",
+    "local_sensors": "Eigene Messstellen (µSv/h)",
+    "start_view": "Startansicht",
+    "map_style": "Kartenstil",
+    "warn_threshold": "Gelb ab",
+    "danger_threshold": "Rot ab",
+    "color_ok": "Farbe normal",
+    "color_warn": "Farbe erhöht",
+    "color_danger": "Farbe hoch",
+    "color_wind": "Farbe Wind",
+    "show_status": "Statuszeile",
+    "show_legend": "Legende",
+    "show_names": "Stationsnamen",
+    "show_values": "Stationswerte"
+  }
+}

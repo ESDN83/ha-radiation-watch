@@ -1,0 +1,92 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Radiation Watch",
+        "description": "Messstationen der Ortsdosisleistung rund um dein Zuhause (BfS-Messnetz und europäisches EURDEP), Frühwarnung nach Windrichtung und eine Kartenkarte. Die Kartenkacheln werden einmalig von OpenStreetMap geladen und danach lokal ausgeliefert.",
+        "data": {
+          "latitude": "Breitengrad",
+          "longitude": "Längengrad",
+          "radius_near": "Radius Nah",
+          "radius_far": "Radius Weit",
+          "wind_entity": "Wetter-Entität für den Wind",
+          "wind_fallback": "Ersatz-Wetter-Entität",
+          "scan_interval": "Abrufintervall"
+        },
+        "data_description": {
+          "latitude": "Mittelpunkt der Karte, vorbelegt mit dem Standort von Home Assistant.",
+          "radius_near": "Radius der Nah-Ansicht.",
+          "radius_far": "Radius der Weit-Ansicht und der Stationssuche. Weiter entfernte Stationen werden ignoriert.",
+          "wind_entity": "Liefert Windrichtung und Windgeschwindigkeit (Attribute wind_bearing und wind_speed).",
+          "wind_fallback": "Wird genutzt, wenn die erste keine Winddaten hat."
+        }
+      }
+    },
+    "error": {
+      "far_not_larger": "Der Radius Weit muss größer sein als der Radius Nah."
+    },
+    "abort": {
+      "already_configured": "Radiation Watch ist bereits eingerichtet.",
+      "single_instance_allowed": "Radiation Watch ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Radiation Watch Optionen",
+        "description": "Eine Änderung von Standort oder Radien erzeugt die Kartenbilder neu.",
+        "data": {
+          "latitude": "Breitengrad",
+          "longitude": "Längengrad",
+          "radius_near": "Radius Nah",
+          "radius_far": "Radius Weit",
+          "wind_entity": "Wetter-Entität für den Wind",
+          "wind_fallback": "Ersatz-Wetter-Entität",
+          "scan_interval": "Abrufintervall",
+          "abs_threshold": "Absolute Schwelle",
+          "median_factor": "Faktor über dem Median",
+          "median_offset": "Mindestabstand über dem Median",
+          "sector": "Windsektor",
+          "min_wind": "Mindestwindgeschwindigkeit",
+          "max_age": "Maximales Alter der Daten"
+        },
+        "data_description": {
+          "latitude": "Mittelpunkt der Karte, vorbelegt mit dem Standort von Home Assistant.",
+          "radius_near": "Radius der Nah-Ansicht.",
+          "radius_far": "Radius der Weit-Ansicht und der Stationssuche. Weiter entfernte Stationen werden ignoriert.",
+          "wind_entity": "Liefert Windrichtung und Windgeschwindigkeit (Attribute wind_bearing und wind_speed).",
+          "wind_fallback": "Wird genutzt, wenn die erste keine Winddaten hat.",
+          "abs_threshold": "Eine Station ab diesem Wert ist immer auffällig.",
+          "median_factor": "Eine Station ist auffällig, wenn sie über Median mal Faktor und über Median plus Mindestabstand liegt.",
+          "median_offset": "Eine Station ist auffällig, wenn sie über Median mal Faktor und über Median plus Mindestabstand liegt.",
+          "sector": "Liegt eine auffällige Station innerhalb dieses Winkels beidseits der Windrichtung, gibt es eine Warnung.",
+          "min_wind": "Darunter ist die Windrichtung zu unstet.",
+          "max_age": "Ältere Messwerte werden verworfen."
+        }
+      }
+    },
+    "error": {
+      "far_not_larger": "Der Radius Weit muss größer sein als der Radius Nah."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "stations": {
+        "name": "Stationen"
+      },
+      "early_warning": {
+        "name": "Frühwarnung",
+        "state": {
+          "calm": "Ruhig",
+          "notable": "Auffällig",
+          "warning": "Warnung"
+        }
+      }
+    },
+    "button": {
+      "regenerate_map": {
+        "name": "Karte neu erzeugen"
+      }
+    }
+  }
+}

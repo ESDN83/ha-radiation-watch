@@ -61,6 +61,11 @@ Move the location or change the radius and the station list follows on the next 
 No other integration is needed (the separate *BfS ODL* integration is not used).
 Outside Europe there are no stations in these sources.
 
+**Without internet** the last station list stays on the map. Measurements older than the maximum data
+age (default 6 h) turn into grey rings and no longer count; when no current measurement is left, the
+early warning switches to `unknown` and the message sensor says so, instead of reporting a false calm.
+The map images are stored locally and stay available.
+
 ## Setup
 
 | Option | Default | Meaning |

@@ -17,5 +17,7 @@
   "warning_item": "{name}, {km} km im Wind, {value} µSv/h, Ankunft ca. {eta} nach der Messung",
   "notable_item": "{name}, {value} µSv/h, {km} km {dir}, nicht im Wind",
   "more": "und {n} weitere",
-  "calm": "Alle Stationen bis {km} km im normalen Bereich."
+  "calm": "Alle Stationen bis {km} km im normalen Bereich.",
+  "title_no_data": "Strahlung: keine aktuellen Daten",
+  "no_data": "Keine aktuellen Messwerte. Internet oder Datendienst nicht erreichbar, die Frühwarnung pausiert."
 }

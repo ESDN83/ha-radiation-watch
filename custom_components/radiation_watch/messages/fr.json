@@ -17,5 +17,7 @@
   "warning_item": "{name}, {km} km au vent, {value} µSv/h, arrivée environ {eta} après la mesure",
   "notable_item": "{name}, {value} µSv/h, {km} km {dir}, pas au vent",
   "more": "et {n} autres",
-  "calm": "Toutes les stations dans un rayon de {km} km sont dans la plage normale."
+  "calm": "Toutes les stations dans un rayon de {km} km sont dans la plage normale.",
+  "title_no_data": "Radiation : pas de données actuelles",
+  "no_data": "Pas de mesures actuelles. Internet ou le service de données est injoignable, l'alerte est en pause."
 }

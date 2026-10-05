@@ -49,7 +49,7 @@
     },
     "unknown": {
       "title": "Alerte précoce : pas de données",
-      "text": "Vérifiez l'intégration Radiation Watch."
+      "text": "Pas de mesures actuelles : Internet ou le service de données est injoignable. L'alerte est en pause, les stations grises sont obsolètes."
     },
     "unavailable": {
       "title": "Alerte précoce : pas de données",
@@ -87,6 +87,8 @@
     "normal": "plage normale",
     "notable": "remarquable, pas au vent",
     "upwind": "remarquable et au vent : arrivée environ {eta} après la mesure",
-    "close": "Fermer"
-  }
+    "close": "Fermer",
+    "stale": "obsolète, mesure de {t}"
+  },
+  "data_time": "Données de {t}"
 }

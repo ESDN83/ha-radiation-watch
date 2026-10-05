@@ -17,6 +17,7 @@ class Station:
     longitude: float
     value: float  # uSv/h
     country: str  # ISO code, "DE" for the German ODL network
+    measured: float | None = None  # end of the measuring interval, epoch seconds
 
 
 @dataclass(frozen=True)

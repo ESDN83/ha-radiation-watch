@@ -67,7 +67,9 @@ def parse_features(
             country = str(f.get("id", "")).split(".")[-1][:2] or "EU"
         else:
             country = "DE"
-        out.append(Station(name=name, latitude=s_lat, longitude=s_lon, value=float(value), country=country))
+        out.append(
+            Station(name=name, latitude=s_lat, longitude=s_lon, value=float(value), country=country, measured=measured.timestamp())
+        )
     return out
 
 

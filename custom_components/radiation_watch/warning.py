@@ -8,9 +8,11 @@ On a change of level the alert event fires and, if configured, notifications go 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 import json
 import logging
 from pathlib import Path
+import time
 
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
@@ -100,6 +102,10 @@ class WarningState:
     title: str = ""
     message: str = ""
     last_level: str | None = None
+    no_data: bool = False  # no station younger than max_age (internet or data service down)
+    fresh_count: int = 0
+    stale_count: int = 0
+    data_time: str | None = None  # newest measurement, ISO
     listeners: list = field(default_factory=list)
 
 
@@ -150,9 +156,27 @@ class WarningEngine:
         s = self.settings
         rules = Rules(s["abs_threshold"], s["median_factor"], s["median_offset"], s["sector"], s["min_wind"])
         bearing, kmh, source = self._wind()
-        result = evaluate(self.coordinator.data.stations, s["latitude"], s["longitude"], bearing, kmh, rules)
         st = self.state
-        st.result, st.wind_bearing, st.wind_kmh, st.wind_source = result, bearing, kmh, source
+        st.wind_bearing, st.wind_kmh, st.wind_source = bearing, kmh, source
+
+        # Without internet the last list stays, but its values get old. Outdated stations must not
+        # count, otherwise a stale list would keep reporting "calm".
+        stations = self.coordinator.data.stations
+        oldest = time.time() - s["max_age"] * 3600
+        fresh = [x for x in stations if x.measured is None or x.measured >= oldest]
+        times = [x.measured for x in stations if x.measured]
+        st.fresh_count, st.stale_count = len(fresh), len(stations) - len(fresh)
+        st.data_time = datetime.fromtimestamp(max(times), timezone.utc).isoformat() if times else None
+        if not fresh:
+            # Level stays as it was for the change detection, so no event fires when data come back.
+            st.result, st.no_data = None, True
+            st.title, st.message = self.texts["title_no_data"], self.texts["no_data"]
+            async_dispatcher_send(self.hass, f"{SIGNAL_EVALUATED}_{self.entry.entry_id}")
+            return
+        st.no_data = False
+
+        result = evaluate(fresh, s["latitude"], s["longitude"], bearing, kmh, rules)
+        st.result = result
         st.title, st.message = build_message(self.texts, result, s["radius_far"])
 
         previous, st.last_level = st.last_level, result.state

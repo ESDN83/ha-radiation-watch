@@ -17,5 +17,7 @@
   "warning_item": "{name}, {km} km upwind, {value} µSv/h, arrives about {eta} after the measurement",
   "notable_item": "{name}, {value} µSv/h, {km} km {dir}, not upwind",
   "more": "and {n} more",
-  "calm": "All stations within {km} km are in the normal range."
+  "calm": "All stations within {km} km are in the normal range.",
+  "title_no_data": "Radiation: no current data",
+  "no_data": "No current measurements. Internet or the data service is not reachable, the warning is paused."
 }

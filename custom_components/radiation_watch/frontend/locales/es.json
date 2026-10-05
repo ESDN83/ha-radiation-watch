@@ -49,7 +49,7 @@
     },
     "unknown": {
       "title": "Alerta temprana: sin datos",
-      "text": "Compruebe la integración Radiation Watch."
+      "text": "Sin mediciones actuales: Internet o el servicio de datos no está disponible. La alerta está en pausa, las estaciones grises están desactualizadas."
     },
     "unavailable": {
       "title": "Alerta temprana: sin datos",
@@ -87,6 +87,8 @@
     "normal": "rango normal",
     "notable": "llamativa, no a barlovento",
     "upwind": "llamativa y a barlovento: llega unos {eta} después de la medición",
-    "close": "Cerrar"
-  }
+    "close": "Cerrar",
+    "stale": "desactualizada, medición de {t}"
+  },
+  "data_time": "Datos de {t}"
 }

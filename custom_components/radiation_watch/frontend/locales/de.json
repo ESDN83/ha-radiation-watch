@@ -49,7 +49,7 @@
     },
     "unknown": {
       "title": "Frühwarnung: keine Daten",
-      "text": "Integration Radiation Watch prüfen."
+      "text": "Keine aktuellen Messwerte: Internet oder Datendienst nicht erreichbar. Die Frühwarnung pausiert, graue Stationen sind veraltet."
     },
     "unavailable": {
       "title": "Frühwarnung: keine Daten",
@@ -87,6 +87,8 @@
     "normal": "normaler Bereich",
     "notable": "auffällig, nicht im Wind",
     "upwind": "auffällig und im Wind: Ankunft ca. {eta} nach der Messung",
-    "close": "Schließen"
-  }
+    "close": "Schließen",
+    "stale": "veraltet, Stand {t}"
+  },
+  "data_time": "Daten von {t}"
 }

@@ -60,8 +60,8 @@ class StationsSensor(CoordinatorEntity[StationCoordinator], SensorEntity):
     def extra_state_attributes(self) -> dict:
         d = self.coordinator.data
         return {
-            # Compact: [name, latitude, longitude, uSv/h, country]
-            "stations": [[s.name, s.latitude, s.longitude, s.value, s.country] for s in d.stations],
+            # Compact: [name, latitude, longitude, uSv/h, country, measured (epoch s)]
+            "stations": [[s.name, s.latitude, s.longitude, s.value, s.country, int(s.measured or 0)] for s in d.stations],
             "fetched_at": d.fetched_at.isoformat(),
         }
 
@@ -89,7 +89,9 @@ class EngineEntity(Entity):
 
     @property
     def available(self) -> bool:
-        return self.engine.state.result is not None
+        # Without current measurements the entities stay available and report unknown / "no data",
+        # so the card can still draw the map with the outdated stations greyed out.
+        return self.engine.state.result is not None or self.engine.state.no_data
 
 
 class EarlyWarningSensor(EngineEntity, SensorEntity):
@@ -143,7 +145,10 @@ class EarlyWarningSensor(EngineEntity, SensorEntity):
             "home": [s["latitude"], s["longitude"]],
             "radius_near": s["radius_near"],
             "radius_far": s["radius_far"],
-            "rules": {k: s[k] for k in ("abs_threshold", "median_factor", "median_offset", "sector", "min_wind")},
+            "rules": {k: s[k] for k in ("abs_threshold", "median_factor", "median_offset", "sector", "min_wind", "max_age")},
+            "fresh_count": st.fresh_count,
+            "stale_count": st.stale_count,
+            "data_time": st.data_time,
             "maps": maps,
             "map_status": rd.map_status,
             "fetched_at": self._entry.runtime_data.coordinator.data.fetched_at.isoformat(),

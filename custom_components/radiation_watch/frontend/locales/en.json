@@ -49,7 +49,7 @@
     },
     "unknown": {
       "title": "Early warning: no data",
-      "text": "Check the Radiation Watch integration."
+      "text": "No current measurements: internet or the data service is not reachable. The warning is paused, grey stations are outdated."
     },
     "unavailable": {
       "title": "Early warning: no data",
@@ -87,6 +87,8 @@
     "normal": "normal range",
     "notable": "notable, not upwind",
     "upwind": "notable and upwind: arrives about {eta} after the measurement",
-    "close": "Close"
-  }
+    "close": "Close",
+    "stale": "outdated, measured {t}"
+  },
+  "data_time": "Data from {t}"
 }

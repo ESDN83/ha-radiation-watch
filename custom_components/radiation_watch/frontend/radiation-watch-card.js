@@ -10,7 +10,7 @@
  * Texts live in locales/<lang>.json next to this file, English is the fallback.
  */
 
-const CARD_VERSION = "0.2.4";
+const CARD_VERSION = "0.2.5";
 const BASE = "/radiation_watch_files/frontend";
 const LOCALES = {};
 const LOADING = {};
@@ -231,7 +231,14 @@ class RadiationWatchCard extends HTMLElement {
     const wb = a.wind_bearing, kmh = a.wind_speed_kmh;
     const wind = typeof wb === "number" && typeof kmh === "number" && kmh >= (rules.min_wind ?? 2);
 
-    const all = ((stEnt && stEnt.attributes.stations) || []).map((x) => ({ n: x[0], v: x[3], l: x[4], ...pos(x[1], x[2]) }));
+    // x[5]: end of the measuring interval (epoch s). Older than max_age = outdated (e.g. no internet).
+    const oldest = Date.now() / 1000 - (rules.max_age ?? 6) * 3600;
+    const all = ((stEnt && stEnt.attributes.stations) || []).map((x) => ({ n: x[0], v: x[3], l: x[4], m: x[5] || 0, old: !!x[5] && x[5] < oldest, ...pos(x[1], x[2]) }));
+    const tfmt = (epoch) => {
+      const d = new Date(epoch * 1000);
+      const sameDay = d.toDateString() === new Date().toDateString();
+      return d.toLocaleString(lng, sameDay ? { hour: "2-digit", minute: "2-digit" } : { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+    };
     const st = all.filter((s) => s.d <= KM);
     // Notable uses the integration's median over the whole far radius, same as the warning sensor.
     const limit = typeof a.limit === "number" ? a.limit : Infinity;
@@ -283,7 +290,7 @@ class RadiationWatchCard extends HTMLElement {
     const upwind = [];
     const sector = rules.sector ?? 45;
     const all2 = st.map((s) => {
-      const au = s.v >= absT || s.v >= limit;
+      const au = !s.old && (s.v >= absT || s.v >= limit);
       return { ...s, au, up: au && wind && diff(s.b, wb) <= sector, key: `${s.n}|${s.d.toFixed(2)}` };
     });
     // Up to 10 notable stations (nearest first) get value and name, also in the far view. More would be clutter.
@@ -302,6 +309,11 @@ class RadiationWatchCard extends HTMLElement {
         o += `<g class="st" data-st="${esc(s.key)}"><title>${esc(s.n)}${land}: ${f(s.v, 3)} µSv/h, ${f(s.d, 0)} km</title>`;
         o += `<circle cx="${x}" cy="${y}" r="11" style="fill:transparent"/>`; // finger-sized tap area
         if (s.key === this._sel) o += `<circle cx="${x}" cy="${y}" r="10" style="fill:none;stroke:${label};stroke-width:2"/>`;
+        if (s.old) {
+          // Outdated: hollow grey ring, no value. Tapping still shows when it was measured.
+          o += `<circle cx="${x}" cy="${y}" r="${far ? 3.5 : 5}" style="fill:none;stroke:#9e9e9e;stroke-width:1.5;stroke-dasharray:2 2"/></g>`;
+          return;
+        }
         o += `<circle cx="${x}" cy="${y}" r="${small ? 3.5 : 6}" style="fill:${col(s.v)};${ring}"/>`;
         if (showLabel) {
           if (c.show_values || s.au) o += `<text x="${x + 8}" y="${y + 2}" style="font-size:8.5px;font-weight:bold;fill:${valueColor};paint-order:stroke;stroke:${halo};stroke-width:2px">${f(s.v, 3)}</text>`;
@@ -326,7 +338,9 @@ class RadiationWatchCard extends HTMLElement {
       const land = sel.l !== "DE" ? ` (${esc(sel.l)})` : "";
       const dir = Array.isArray(dirs) ? dirs[Math.round(sel.b / 45) % 8] : "";
       let state = esc(this._t("info.normal"));
-      if (sel.up) {
+      if (sel.old) {
+        state = `<i>${esc(this._t("info.stale", { t: tfmt(sel.m) }))}</i>`;
+      } else if (sel.up) {
         const m = Math.round((sel.d / kmh) * 60);
         state = `<b style="color:${c.color_danger}">${esc(this._t("info.upwind", { eta: m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min` }))}</b>`;
       } else if (sel.au) {
@@ -356,6 +370,7 @@ class RadiationWatchCard extends HTMLElement {
       t += `<br><b style="color:${c.color_danger}">${esc(this._t("eta", { name: s.n + (s.l !== "DE" ? ` (${s.l})` : ""), km: f(s.d, 0), eta }))}</b>`;
     });
     if (upwind.length) t += `<br>${esc(this._t("eta_note"))}`;
+    if (a.data_time) t += `<br>${esc(this._t("data_time", { t: tfmt(Date.parse(a.data_time) / 1000) }))}`;
     if (a.map_status === "building") t += `<br><i>${esc(this._t("map_building"))}</i>`;
     t += `</div>`;
 

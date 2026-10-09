@@ -11,6 +11,7 @@
           "radius_far": "Rayon lointain",
           "wind_entity": "Entité météo pour le vent",
           "wind_fallback": "Entité météo de secours",
+          "wind_mode": "Vent utilisé pour l'alerte",
           "scan_interval": "Intervalle de mise à jour"
         },
         "data_description": {
@@ -18,7 +19,8 @@
           "radius_near": "Rayon de la vue proche.",
           "radius_far": "Rayon de la vue lointaine et de la recherche des stations. Les stations plus éloignées sont ignorées.",
           "wind_entity": "Fournit la direction et la vitesse du vent (attributs wind_bearing et wind_speed).",
-          "wind_fallback": "Utilisée si la première n'a pas de données de vent."
+          "wind_fallback": "Utilisée si la première n'a pas de données de vent.",
+          "wind_mode": "Le vent à environ 1,5 km (Open-Meteo, 850 hPa) détermine où va un nuage ; le vent au sol peut s'écarter de 40 à 70 degrés et il est bien plus lent. Les deux : une station est au vent si l'un des deux vents pointe vers elle."
         }
       }
     },
@@ -42,6 +44,7 @@
           "radius_far": "Rayon lointain",
           "wind_entity": "Entité météo pour le vent",
           "wind_fallback": "Entité météo de secours",
+          "wind_mode": "Vent utilisé pour l'alerte",
           "scan_interval": "Intervalle de mise à jour",
           "abs_threshold": "Seuil absolu",
           "median_factor": "Facteur au-dessus de la médiane",
@@ -59,6 +62,7 @@
           "radius_far": "Rayon de la vue lointaine et de la recherche des stations. Les stations plus éloignées sont ignorées.",
           "wind_entity": "Fournit la direction et la vitesse du vent (attributs wind_bearing et wind_speed).",
           "wind_fallback": "Utilisée si la première n'a pas de données de vent.",
+          "wind_mode": "Le vent à environ 1,5 km (Open-Meteo, 850 hPa) détermine où va un nuage ; le vent au sol peut s'écarter de 40 à 70 degrés et il est bien plus lent. Les deux : une station est au vent si l'un des deux vents pointe vers elle.",
           "abs_threshold": "Une station à partir de cette valeur est toujours remarquable.",
           "median_factor": "Une station est remarquable si elle dépasse médiane x facteur et médiane + écart minimal.",
           "median_offset": "Une station est remarquable si elle dépasse médiane x facteur et médiane + écart minimal.",
@@ -73,6 +77,15 @@
     },
     "error": {
       "far_not_larger": "Le rayon lointain doit être plus grand que le rayon proche."
+    }
+  },
+  "selector": {
+    "wind_mode": {
+      "options": {
+        "both": "Altitude et sol (recommandé)",
+        "upper": "Altitude seulement (Open-Meteo)",
+        "surface": "Sol seulement (entité météo)"
+      }
     }
   },
   "entity": {

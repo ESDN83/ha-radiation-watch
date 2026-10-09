@@ -19,8 +19,12 @@
   },
   "wind": {
     "from": "Viento del {dir}",
-    "hint": "El sector coloreado muestra las estaciones cuyo aire se dirige hacia usted, los arcos cuánto tarda en llegar.",
-    "none": "Viento demasiado débil o sin datos: sin dirección."
+    "hint": "Sector coloreado: de dónde viene el aire a 1,5 km; punteado: nubes a 3 km; discontinuo: superficie. Una estación en cualquiera de ellos está a barlovento. Los arcos muestran cuánto tarda el aire en llegar.",
+    "none": "Viento demasiado débil o sin datos: sin dirección.",
+    "upper": "Viento a 1,5 km del {dir}",
+    "surface": "Superficie: {dir}, {kmh} km/h.",
+    "cloud": "Nubes (3 km): del {dir}.",
+    "surface_only": "Solo viento en superficie, viento en altura no disponible."
   },
   "home": "Hogar (cuadrado, media 1 h)",
   "no_value": "sin valor",

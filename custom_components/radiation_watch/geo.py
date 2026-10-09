@@ -77,26 +77,38 @@ def notable_limit(med: float, rules: Rules) -> float:
     return max(med * rules.median_factor, med + rules.median_offset)
 
 
+@dataclass(frozen=True)
+class Wind:
+    """One wind layer: direction the wind comes from (0 = north) and speed."""
+
+    bearing: float
+    kmh: float
+    source: str = ""
+
+
 def evaluate(
     stations: list[Station],
     lat0: float,
     lon0: float,
-    wind_bearing: float | None,
-    wind_kmh: float | None,
+    winds: list[Wind],
     rules: Rules,
 ) -> Evaluation:
     """Classify the situation.
 
     calm:    no station stands out.
     notable: at least one station is above the limit, but not upwind.
-    warning: a notable station lies in the direction the wind comes from
-             (wind_bearing +- sector), so its air is heading towards home.
+    warning: a notable station lies in the direction one of the winds comes from
+             (bearing +- sector), so its air is heading towards home.
+
+    Several winds (e.g. 1.5 km height and surface) count as an OR: a plume travels with the wind
+    aloft, rain washes it out from higher up, the surface wind can differ by 40 to 70 degrees.
+    The arrival time uses the fastest matching wind, the cautious (earlier) estimate.
     """
     med = median([s.value for s in stations])
     if med is None:
         return Evaluation(state="calm", median=None, limit=None)
     limit = notable_limit(med, rules)
-    has_wind = wind_bearing is not None and wind_kmh is not None and wind_kmh >= rules.min_wind
+    usable = [w for w in winds if w.kmh is not None and w.kmh >= rules.min_wind]
 
     notable: list[dict] = []
     upwind: list[dict] = []
@@ -112,8 +124,10 @@ def evaluate(
             "bearing": round(bearing),
         }
         notable.append(item)
-        if has_wind and angle_diff(bearing, wind_bearing) <= rules.sector:
-            item = {**item, "eta_min": round(dist / wind_kmh * 60)}
+        matching = [w for w in usable if angle_diff(bearing, w.bearing) <= rules.sector]
+        if matching:
+            fastest = max(matching, key=lambda w: w.kmh)
+            item = {**item, "eta_min": round(dist / fastest.kmh * 60), "wind": fastest.source}
             upwind.append(item)
 
     notable.sort(key=lambda i: i["distance_km"])

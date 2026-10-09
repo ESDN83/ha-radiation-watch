@@ -19,7 +19,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_state_change_event
 
 from .const import DOMAIN, STATE_CALM, STATE_NOTABLE, STATE_WARNING
-from .geo import Evaluation, Rules, evaluate, to_kmh
+from .geo import Evaluation, Rules, Wind, evaluate, to_kmh
 
 _LOGGER = logging.getLogger(__name__)
 SIGNAL_EVALUATED = f"{DOMAIN}_evaluated"
@@ -99,6 +99,9 @@ class WarningState:
     wind_bearing: float | None = None
     wind_kmh: float | None = None
     wind_source: str | None = None
+    winds: list = field(default_factory=list)  # all layers used for the sector check
+    surface: tuple | None = None  # (bearing, kmh, entity)
+    upper: object | None = None  # UpperWind or None
     title: str = ""
     message: str = ""
     last_level: str | None = None
@@ -110,8 +113,9 @@ class WarningState:
 
 
 class WarningEngine:
-    def __init__(self, hass: HomeAssistant, entry, settings: dict, coordinator, texts: dict) -> None:
+    def __init__(self, hass: HomeAssistant, entry, settings: dict, coordinator, texts: dict, upper=None) -> None:
         self.hass = hass
+        self.upper_coordinator = upper
         self.entry = entry
         self.settings = settings
         self.coordinator = coordinator
@@ -126,6 +130,8 @@ class WarningEngine:
         if wind:
             self.entry.async_on_unload(async_track_state_change_event(self.hass, wind, self._wind_changed))
         self.entry.async_on_unload(self.coordinator.async_add_listener(self.async_evaluate))
+        if self.upper_coordinator:
+            self.entry.async_on_unload(self.upper_coordinator.async_add_listener(self.async_evaluate))
         self.async_evaluate()
 
     @callback
@@ -155,9 +161,33 @@ class WarningEngine:
     def async_evaluate(self) -> None:
         s = self.settings
         rules = Rules(s["abs_threshold"], s["median_factor"], s["median_offset"], s["sector"], s["min_wind"])
-        bearing, kmh, source = self._wind()
         st = self.state
-        st.wind_bearing, st.wind_kmh, st.wind_source = bearing, kmh, source
+        bearing, kmh, source = self._wind()
+        st.surface = (bearing, kmh, source) if bearing is not None else None
+        st.upper = self.upper_coordinator.current() if self.upper_coordinator else None
+        surface_w = Wind(bearing, kmh, source) if bearing is not None and kmh is not None else None
+        upper_w = Wind(st.upper.bearing_850, st.upper.kmh_850, "850 hPa") if st.upper else None
+        # Cloud level (about 3 km): a plume from a fire or explosion can rise this high, and rain
+        # from these clouds washes particles out. What the rain radar shows moves with this wind.
+        cloud_w = (
+            Wind(st.upper.bearing_700, st.upper.kmh_700, "700 hPa")
+            if st.upper and st.upper.bearing_700 is not None and st.upper.kmh_700 is not None
+            else None
+        )
+        mode = s["wind_mode"]
+        if mode == "surface":
+            winds = [surface_w]
+        elif mode == "upper":
+            # surface only as a stand-in while Open-Meteo is unreachable
+            winds = [upper_w, cloud_w] if upper_w else [surface_w]
+        else:
+            winds = [upper_w, cloud_w, surface_w]
+        st.winds = [w for w in winds if w is not None]
+        # The primary wind drives the map sector and arcs: aloft when available.
+        primary = upper_w if (upper_w and mode != "surface") else surface_w
+        st.wind_bearing = primary.bearing if primary else None
+        st.wind_kmh = primary.kmh if primary else None
+        st.wind_source = primary.source if primary else None
 
         # Without internet the last list stays, but its values get old. Outdated stations must not
         # count, otherwise a stale list would keep reporting "calm".
@@ -175,7 +205,7 @@ class WarningEngine:
             return
         st.no_data = False
 
-        result = evaluate(fresh, s["latitude"], s["longitude"], bearing, kmh, rules)
+        result = evaluate(fresh, s["latitude"], s["longitude"], st.winds, rules)
         st.result = result
         st.title, st.message = build_message(self.texts, result, s["radius_far"])
 

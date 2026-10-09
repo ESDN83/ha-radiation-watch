@@ -19,8 +19,12 @@
   },
   "wind": {
     "from": "Vent du {dir}",
-    "hint": "Le secteur coloré montre les stations dont l'air se dirige vers vous, les arcs le temps qu'il lui faut pour arriver.",
-    "none": "Vent trop faible ou pas de données : aucune direction."
+    "hint": "Secteur coloré : d'où vient l'air à 1,5 km ; pointillé fin : nuages à 3 km ; tirets : sol. Une station dans l'un d'eux est au vent. Les arcs montrent le temps qu'il faut à l'air pour arriver.",
+    "none": "Vent trop faible ou pas de données : aucune direction.",
+    "upper": "Vent à 1,5 km du {dir}",
+    "surface": "Sol : {dir}, {kmh} km/h.",
+    "cloud": "Nuages (3 km) : du {dir}.",
+    "surface_only": "Vent au sol uniquement, vent en altitude indisponible."
   },
   "home": "Domicile (carré, moyenne 1 h)",
   "no_value": "sans valeur",

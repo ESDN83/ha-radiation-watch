@@ -29,6 +29,8 @@ from .const import (
     CONF_NOTIFY_ALL_CLEAR,
     CONF_NOTIFY_NOTABLE,
     CONF_NOTIFY_SERVICES,
+    CONF_WIND_MODE,
+    DEFAULT_WIND_MODE,
     CONF_RADIUS_FAR,
     CONF_RADIUS_NEAR,
     CONF_SCAN_INTERVAL,
@@ -51,6 +53,7 @@ from .const import (
     VERSION,
 )
 from .coordinator import StationCoordinator
+from .upper_wind import UpperWindCoordinator
 from .mapgen import async_build_maps, maps_current, read_meta
 from .warning import WarningEngine, load_messages
 
@@ -68,6 +71,7 @@ class RuntimeData:
     map_version: int | None = None
     map_status: str = "missing"  # missing, building, ready, failed
     engine: WarningEngine | None = None
+    upper_wind: UpperWindCoordinator | None = None
     tasks: list = field(default_factory=list)
 
 
@@ -94,6 +98,7 @@ def merged_settings(hass: HomeAssistant, entry: ConfigEntry) -> dict:
         "notify_services": list(c.get(CONF_NOTIFY_SERVICES) or []),
         "notify_notable": bool(c.get(CONF_NOTIFY_NOTABLE, False)),
         "notify_all_clear": bool(c.get(CONF_NOTIFY_ALL_CLEAR, True)),
+        "wind_mode": c.get(CONF_WIND_MODE, DEFAULT_WIND_MODE),
     }
 
 
@@ -147,8 +152,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: RadiationWatchConfigEntr
     coordinator = StationCoordinator(hass, entry, settings)
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = RuntimeData(coordinator=coordinator, settings=settings)
+    upper = None
+    if settings["wind_mode"] != "surface":
+        upper = UpperWindCoordinator(hass, entry, settings["latitude"], settings["longitude"])
+        await upper.async_refresh()  # no first_refresh: setup must not fail when Open-Meteo is down
+    entry.runtime_data.upper_wind = upper
     texts = await hass.async_add_executor_job(load_messages, hass.config.language)
-    entry.runtime_data.engine = WarningEngine(hass, entry, settings, coordinator, texts)
+    entry.runtime_data.engine = WarningEngine(hass, entry, settings, coordinator, texts, upper)
 
     folder = maps_dir(hass)
     current = await hass.async_add_executor_job(

@@ -19,8 +19,12 @@
   },
   "wind": {
     "from": "Wind from {dir}",
-    "hint": "The shaded sector shows the stations whose air is heading towards you, the arcs how long it takes to get here.",
-    "none": "Wind too weak or no wind data: no direction."
+    "hint": "Shaded sector: where the air at 1.5 km comes from; dotted: clouds at 3 km; dashed: surface. A station in any of them counts as upwind. The arcs show how long the air takes to get here.",
+    "none": "Wind too weak or no wind data: no direction.",
+    "upper": "Wind at 1.5 km from {dir}",
+    "surface": "Surface: {dir}, {kmh} km/h.",
+    "cloud": "Clouds (3 km): from {dir}.",
+    "surface_only": "Surface wind only, wind aloft not available."
   },
   "home": "Home (square, 1 h mean)",
   "no_value": "no value",

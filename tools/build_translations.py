@@ -9,6 +9,7 @@ from pathlib import Path
 
 TEXT = {
     "en": dict(
+        wm="Wind used for the warning", d_wm="Wind at about 1.5 km height (Open-Meteo, 850 hPa) is how a plume travels; the surface wind can differ by 40 to 70 degrees and is much slower. Both: a station counts as upwind if either wind points to it.", wm_both="Height and surface (recommended)", wm_upper="Height only (Open-Meteo)", wm_surface="Surface only (weather entity)",
         med="Regional median",
         bs="Warning", msg="Message", alert="Alert", ev_warning="Warning", ev_notable="Station notable", ev_clear="All clear",
         n_svc="Send notifications to", n_notable="Also notify when a station is notable", n_clear="Notify the all clear",
@@ -30,6 +31,7 @@ TEXT = {
         st="Stations", ew="Early warning", calm="Calm", notable="Notable", warning="Warning", btn="Regenerate map",
     ),
     "de": dict(
+        wm="Wind für die Warnung", d_wm="Wind in etwa 1,5 km Höhe (Open-Meteo, 850 hPa) bestimmt, wohin eine Wolke zieht; der Bodenwind weicht oft um 40 bis 70 Grad ab und ist viel langsamer. Beide: Eine Station gilt als im Wind, wenn einer der beiden auf sie zeigt.", wm_both="Höhe und Boden (empfohlen)", wm_upper="Nur Höhe (Open-Meteo)", wm_surface="Nur Boden (Wetter-Entität)",
         med="Median Region",
         bs="Warnung", msg="Meldung", alert="Alarm", ev_warning="Warnung", ev_notable="Station auffällig", ev_clear="Entwarnung",
         n_svc="Benachrichtigungen senden an", n_notable="Auch bei auffälliger Station benachrichtigen", n_clear="Entwarnung senden",
@@ -51,6 +53,7 @@ TEXT = {
         st="Stationen", ew="Frühwarnung", calm="Ruhig", notable="Auffällig", warning="Warnung", btn="Karte neu erzeugen",
     ),
     "fr": dict(
+        wm="Vent utilisé pour l'alerte", d_wm="Le vent à environ 1,5 km (Open-Meteo, 850 hPa) détermine où va un nuage ; le vent au sol peut s'écarter de 40 à 70 degrés et il est bien plus lent. Les deux : une station est au vent si l'un des deux vents pointe vers elle.", wm_both="Altitude et sol (recommandé)", wm_upper="Altitude seulement (Open-Meteo)", wm_surface="Sol seulement (entité météo)",
         med="Médiane régionale",
         bs="Alerte", msg="Message", alert="Alarme", ev_warning="Alerte", ev_notable="Station remarquable", ev_clear="Fin d'alerte",
         n_svc="Envoyer les notifications à", n_notable="Notifier aussi une station remarquable", n_clear="Notifier la fin d'alerte",
@@ -72,6 +75,7 @@ TEXT = {
         st="Stations", ew="Alerte précoce", calm="Calme", notable="Remarquable", warning="Alerte", btn="Régénérer la carte",
     ),
     "es": dict(
+        wm="Viento para la alerta", d_wm="El viento a unos 1,5 km (Open-Meteo, 850 hPa) determina hacia dónde va una nube; el viento en superficie puede desviarse de 40 a 70 grados y es mucho más lento. Ambos: una estación está a barlovento si cualquiera de los dos apunta hacia ella.", wm_both="Altura y superficie (recomendado)", wm_upper="Solo altura (Open-Meteo)", wm_surface="Solo superficie (entidad meteorológica)",
         med="Mediana regional",
         bs="Alerta", msg="Mensaje", alert="Alarma", ev_warning="Alerta", ev_notable="Estación llamativa", ev_clear="Fin de la alerta",
         n_svc="Enviar notificaciones a", n_notable="Notificar también una estación llamativa", n_clear="Notificar el fin de la alerta",
@@ -97,9 +101,9 @@ TEXT = {
 
 def build(t: dict) -> dict:
     base_data = {"latitude": t["lat"], "longitude": t["lon"], "radius_near": t["near"], "radius_far": t["far"],
-                 "wind_entity": t["wind"], "wind_fallback": t["wfb"], "scan_interval": t["scan"]}
+                 "wind_entity": t["wind"], "wind_fallback": t["wfb"], "wind_mode": t["wm"], "scan_interval": t["scan"]}
     base_desc = {"latitude": t["d_lat"], "radius_near": t["d_near"], "radius_far": t["d_far"],
-                 "wind_entity": t["d_wind"], "wind_fallback": t["d_wfb"]}
+                 "wind_entity": t["d_wind"], "wind_fallback": t["d_wfb"], "wind_mode": t["d_wm"]}
     rules_data = {"abs_threshold": t["abs"], "median_factor": t["fac"], "median_offset": t["off"],
                   "sector": t["sec"], "min_wind": t["minw"], "max_age": t["age"]}
     notify_data = {"notify_services": t["n_svc"], "notify_notable": t["n_notable"], "notify_all_clear": t["n_clear"]}
@@ -118,6 +122,7 @@ def build(t: dict) -> dict:
                               "data_description": {**base_desc, **rules_desc, **notify_desc}}},
             "error": {"far_not_larger": t["err_far"]},
         },
+        "selector": {"wind_mode": {"options": {"both": t["wm_both"], "upper": t["wm_upper"], "surface": t["wm_surface"]}}},
         "entity": {
             "sensor": {
                 "stations": {"name": t["st"]},

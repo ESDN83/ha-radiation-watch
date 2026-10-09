@@ -10,7 +10,7 @@
  * Texts live in locales/<lang>.json next to this file, English is the fallback.
  */
 
-const CARD_VERSION = "0.2.5";
+const CARD_VERSION = "0.3.1";
 const BASE = "/radiation_watch_files/frontend";
 const LOCALES = {};
 const LOADING = {};
@@ -230,6 +230,13 @@ class RadiationWatchCard extends HTMLElement {
     };
     const wb = a.wind_bearing, kmh = a.wind_speed_kmh;
     const wind = typeof wb === "number" && typeof kmh === "number" && kmh >= (rules.min_wind ?? 2);
+    const minWind = rules.min_wind ?? 2;
+    const winds = (Array.isArray(a.winds) && a.winds.length ? a.winds : wind ? [{ bearing: wb, kmh, source: a.wind_source }] : [])
+      .filter((w) => typeof w.bearing === "number" && typeof w.kmh === "number" && w.kmh >= minWind);
+    // Fastest wind whose sector contains the bearing: the cautious (earlier) arrival.
+    const matchWind = (b) => winds.filter((w) => diff(b, w.bearing) <= (rules.sector ?? 45)).sort((x, y) => y.kmh - x.kmh)[0];
+    const sw = typeof a.surface_wind_bearing === "number" && typeof a.surface_wind_kmh === "number" ? { b: a.surface_wind_bearing, k: a.surface_wind_kmh } : null;
+    const showSurface = sw && a.upper_wind_bearing != null && a.wind_mode !== "surface" && sw.k >= minWind;
 
     // x[5]: end of the measuring interval (epoch s). Older than max_age = outdated (e.g. no internet).
     const oldest = Date.now() / 1000 - (rules.max_age ?? 6) * 3600;
@@ -257,6 +264,17 @@ class RadiationWatchCard extends HTMLElement {
     if (wind) {
       const p1 = pt(wb - (rules.sector ?? 45), R), p2 = pt(wb + (rules.sector ?? 45), R);
       o += `<path d="M${C},${C} L${p1[0]},${p1[1]} A${R},${R} 0 0 1 ${p2[0]},${p2[1]} Z" style="fill:${c.color_wind};opacity:.18"/>`;
+    }
+    const outline = (b, dash) => {
+      const p1 = pt(b - (rules.sector ?? 45), R), p2 = pt(b + (rules.sector ?? 45), R);
+      o += `<path d="M${C},${C} L${p1[0]},${p1[1]} A${R},${R} 0 0 1 ${p2[0]},${p2[1]} Z" style="fill:none;stroke:${c.color_wind};stroke-width:1.2;stroke-opacity:.7;stroke-dasharray:${dash}"/>`;
+    };
+    if (showSurface && a.wind_mode === "both") outline(sw.b, "4 3"); // surface: dashed
+    const cw = winds.find((w) => w.source === "700 hPa");
+    if (cw) {
+      outline(cw.bearing, "1 3"); // clouds about 3 km: dotted
+      const s3 = pt(cw.bearing, R * 0.7), e3 = pt(cw.bearing, 12);
+      o += `<line x1="${s3[0]}" y1="${s3[1]}" x2="${e3[0]}" y2="${e3[1]}" style="stroke:${c.color_wind};stroke-width:1.5;stroke-dasharray:1 3;stroke-linecap:round;opacity:.9"/>`;
     }
     const rings = far ? [KM / 3, (2 * KM) / 3, KM] : [KM / 4, KM / 2, KM];
     rings.forEach((r) => {
@@ -286,12 +304,17 @@ class RadiationWatchCard extends HTMLElement {
       o += `<g opacity="0.75"><line x1="${s[0]}" y1="${s[1]}" x2="${bx}" y2="${by}" style="stroke:${c.color_wind};stroke-width:3"/>`;
       o += `<polygon points="${e[0]},${e[1]} ${bx - uy * 6},${by + ux * 6} ${bx + uy * 6},${by - ux * 6}" style="fill:${c.color_wind}"/></g>`;
     }
+    if (showSurface) {
+      const s2 = pt(sw.b, R * 0.55), e2 = pt(sw.b, 12);
+      o += `<line x1="${s2[0]}" y1="${s2[1]}" x2="${e2[0]}" y2="${e2[1]}" style="stroke:${c.color_wind};stroke-width:1.5;stroke-dasharray:4 3;opacity:.8"/>`;
+    }
 
     const upwind = [];
     const sector = rules.sector ?? 45;
     const all2 = st.map((s) => {
       const au = !s.old && (s.v >= absT || s.v >= limit);
-      return { ...s, au, up: au && wind && diff(s.b, wb) <= sector, key: `${s.n}|${s.d.toFixed(2)}` };
+      const mw = au ? matchWind(s.b) : null;
+      return { ...s, au, up: !!mw, upKmh: mw ? mw.kmh : null, key: `${s.n}|${s.d.toFixed(2)}` };
     });
     // Up to 10 notable stations (nearest first) get value and name, also in the far view. More would be clutter.
     const labelled = new Set(all2.filter((s) => s.au).sort((x, y) => x.d - y.d).slice(0, 10).map((s) => s.key));
@@ -329,7 +352,7 @@ class RadiationWatchCard extends HTMLElement {
     const ov = own.filter((x) => !isNaN(x.v)).map((x) => x.v);
     const hm = ov.length ? Math.max(...ov) : null;
     o += `<rect x="${C - 7}" y="${C - 7}" width="14" height="14" rx="3" style="fill:${hm === null ? "var(--secondary-text-color)" : col(hm)};stroke:${label};stroke-width:2"/>`;
-    o += `<text x="${C + R}" y="${C + R + 8}" text-anchor="end" style="font-size:7px;fill:var(--secondary-text-color)">${esc(this._t("attribution"))}</text></svg>`;
+    o += `<text x="${C + R}" y="${C + R + 8}" text-anchor="end" style="font-size:7px;fill:var(--secondary-text-color)">${esc(this._t("attribution"))}${a.attribution_wind ? " · Wind Open-Meteo.com" : ""}</text></svg>`;
 
     // Info box for the tapped station
     let info = "";
@@ -341,7 +364,7 @@ class RadiationWatchCard extends HTMLElement {
       if (sel.old) {
         state = `<i>${esc(this._t("info.stale", { t: tfmt(sel.m) }))}</i>`;
       } else if (sel.up) {
-        const m = Math.round((sel.d / kmh) * 60);
+        const m = Math.round((sel.d / sel.upKmh) * 60);
         state = `<b style="color:${c.color_danger}">${esc(this._t("info.upwind", { eta: m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min` }))}</b>`;
       } else if (sel.au) {
         state = `<b style="color:${c.color_warn}">${esc(this._t("info.notable"))}</b>`;
@@ -354,10 +377,15 @@ class RadiationWatchCard extends HTMLElement {
 
     // Text below the map
     const dot = (cl) => `<span class="dot" style="background:${cl}"></span>`;
+    const dn = (b) => (Array.isArray(dirs) ? dirs[Math.round(b / 45) % 8] : "");
     let t = `<div class="text">`;
     t += `<b>${esc(this._t(far ? "view.far" : "view.near", { km: f(KM, 0) }))}</b>, ${esc(this._t("stations", { n: st.length }))}. ${esc(this._t("tap.station"))}`;
     t += wind
-      ? `<br><b>${esc(this._t("wind.from", { dir: Array.isArray(dirs) ? dirs[Math.round(wb / 45) % 8] : "" }))}</b> (${Math.round(wb)}°), ${f(kmh, 1)} km/h. ${esc(this._t("wind.hint"))}`
+      ? `<br><b>${esc(this._t(a.upper_wind_bearing != null && a.wind_mode !== "surface" ? "wind.upper" : "wind.from", { dir: dn(wb) }))}</b> (${Math.round(wb)}°), ${f(kmh, 0)} km/h.`
+        + (sw && a.upper_wind_bearing != null && a.wind_mode !== "surface" ? ` ${esc(this._t("wind.surface", { dir: dn(sw.b), kmh: f(sw.k, 0) }))}` : "")
+        + (typeof a.cloud_wind_bearing === "number" && a.wind_mode !== "surface" ? ` ${esc(this._t("wind.cloud", { dir: dn(a.cloud_wind_bearing) }))}` : "")
+        + (a.upper_wind_bearing == null && a.wind_mode !== "surface" ? ` <i>${esc(this._t("wind.surface_only"))}</i>` : "")
+        + ` ${esc(this._t("wind.hint"))}`
       : `<br>${esc(this._t("wind.none"))}`;
     if (own.length) t += `<br>${esc(this._t("home"))}: ${own.map((x) => (isNaN(x.v) ? `${esc(x.name)} ${esc(this._t("no_value"))}` : `${dot(col(x.v))}${esc(x.name)} ${f(x.v, 3)}`)).join(" ")} µSv/h`;
     if (typeof a.median === "number") t += `<br>${esc(this._t("median", { median: f(a.median, 3), limit: f(Math.min(limit, absT), 3) }))}`;
@@ -365,7 +393,7 @@ class RadiationWatchCard extends HTMLElement {
       t += `<br>${dot(c.color_ok)}${esc(this._t("legend.below", { v: f(c.warn_threshold, 1) }))} ${dot(c.color_warn)}${esc(this._t("legend.from", { v: f(c.warn_threshold, 1) }))} ${dot(c.color_danger)}${esc(this._t("legend.from", { v: f(c.danger_threshold, 1) }))} µSv/h. ${esc(this._t("legend.rings"))}`;
     }
     upwind.sort((x, y) => x.d - y.d).slice(0, 5).forEach((s) => {
-      const m = Math.round((s.d / kmh) * 60);
+      const m = Math.round((s.d / s.upKmh) * 60);
       const eta = m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min`;
       t += `<br><b style="color:${c.color_danger}">${esc(this._t("eta", { name: s.n + (s.l !== "DE" ? ` (${s.l})` : ""), km: f(s.d, 0), eta }))}</b>`;
     });

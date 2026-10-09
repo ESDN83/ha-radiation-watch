@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 DOMAIN = "radiation_watch"
-VERSION = "0.2.5"
+VERSION = "0.3.1"
 
 # Config entry keys
 CONF_LATITUDE = "latitude"
@@ -22,6 +22,9 @@ CONF_MAX_AGE = "max_age"
 CONF_NOTIFY_SERVICES = "notify_services"
 CONF_NOTIFY_NOTABLE = "notify_notable"
 CONF_NOTIFY_ALL_CLEAR = "notify_all_clear"
+CONF_WIND_MODE = "wind_mode"
+WIND_MODES = ["both", "upper", "surface"]  # upper = Open-Meteo 850 hPa
+DEFAULT_WIND_MODE = "both"
 
 DEFAULT_RADIUS_NEAR = 40
 DEFAULT_RADIUS_FAR = 120

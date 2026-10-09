@@ -11,6 +11,7 @@
           "radius_far": "Radius Weit",
           "wind_entity": "Wetter-Entität für den Wind",
           "wind_fallback": "Ersatz-Wetter-Entität",
+          "wind_mode": "Wind für die Warnung",
           "scan_interval": "Abrufintervall"
         },
         "data_description": {
@@ -18,7 +19,8 @@
           "radius_near": "Radius der Nah-Ansicht.",
           "radius_far": "Radius der Weit-Ansicht und der Stationssuche. Weiter entfernte Stationen werden ignoriert.",
           "wind_entity": "Liefert Windrichtung und Windgeschwindigkeit (Attribute wind_bearing und wind_speed).",
-          "wind_fallback": "Wird genutzt, wenn die erste keine Winddaten hat."
+          "wind_fallback": "Wird genutzt, wenn die erste keine Winddaten hat.",
+          "wind_mode": "Wind in etwa 1,5 km Höhe (Open-Meteo, 850 hPa) bestimmt, wohin eine Wolke zieht; der Bodenwind weicht oft um 40 bis 70 Grad ab und ist viel langsamer. Beide: Eine Station gilt als im Wind, wenn einer der beiden auf sie zeigt."
         }
       }
     },
@@ -42,6 +44,7 @@
           "radius_far": "Radius Weit",
           "wind_entity": "Wetter-Entität für den Wind",
           "wind_fallback": "Ersatz-Wetter-Entität",
+          "wind_mode": "Wind für die Warnung",
           "scan_interval": "Abrufintervall",
           "abs_threshold": "Absolute Schwelle",
           "median_factor": "Faktor über dem Median",
@@ -59,6 +62,7 @@
           "radius_far": "Radius der Weit-Ansicht und der Stationssuche. Weiter entfernte Stationen werden ignoriert.",
           "wind_entity": "Liefert Windrichtung und Windgeschwindigkeit (Attribute wind_bearing und wind_speed).",
           "wind_fallback": "Wird genutzt, wenn die erste keine Winddaten hat.",
+          "wind_mode": "Wind in etwa 1,5 km Höhe (Open-Meteo, 850 hPa) bestimmt, wohin eine Wolke zieht; der Bodenwind weicht oft um 40 bis 70 Grad ab und ist viel langsamer. Beide: Eine Station gilt als im Wind, wenn einer der beiden auf sie zeigt.",
           "abs_threshold": "Eine Station ab diesem Wert ist immer auffällig.",
           "median_factor": "Eine Station ist auffällig, wenn sie über Median mal Faktor und über Median plus Mindestabstand liegt.",
           "median_offset": "Eine Station ist auffällig, wenn sie über Median mal Faktor und über Median plus Mindestabstand liegt.",
@@ -73,6 +77,15 @@
     },
     "error": {
       "far_not_larger": "Der Radius Weit muss größer sein als der Radius Nah."
+    }
+  },
+  "selector": {
+    "wind_mode": {
+      "options": {
+        "both": "Höhe und Boden (empfohlen)",
+        "upper": "Nur Höhe (Open-Meteo)",
+        "surface": "Nur Boden (Wetter-Entität)"
+      }
     }
   },
   "entity": {

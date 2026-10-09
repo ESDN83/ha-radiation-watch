@@ -11,6 +11,7 @@
           "radius_far": "Radio lejano",
           "wind_entity": "Entidad meteorológica para el viento",
           "wind_fallback": "Entidad meteorológica de reserva",
+          "wind_mode": "Viento para la alerta",
           "scan_interval": "Intervalo de actualización"
         },
         "data_description": {
@@ -18,7 +19,8 @@
           "radius_near": "Radio de la vista cercana.",
           "radius_far": "Radio de la vista lejana y de la búsqueda de estaciones. Las estaciones más lejanas se ignoran.",
           "wind_entity": "Proporciona la dirección y la velocidad del viento (atributos wind_bearing y wind_speed).",
-          "wind_fallback": "Se usa cuando la primera no tiene datos de viento."
+          "wind_fallback": "Se usa cuando la primera no tiene datos de viento.",
+          "wind_mode": "El viento a unos 1,5 km (Open-Meteo, 850 hPa) determina hacia dónde va una nube; el viento en superficie puede desviarse de 40 a 70 grados y es mucho más lento. Ambos: una estación está a barlovento si cualquiera de los dos apunta hacia ella."
         }
       }
     },
@@ -42,6 +44,7 @@
           "radius_far": "Radio lejano",
           "wind_entity": "Entidad meteorológica para el viento",
           "wind_fallback": "Entidad meteorológica de reserva",
+          "wind_mode": "Viento para la alerta",
           "scan_interval": "Intervalo de actualización",
           "abs_threshold": "Umbral absoluto",
           "median_factor": "Factor sobre la mediana",
@@ -59,6 +62,7 @@
           "radius_far": "Radio de la vista lejana y de la búsqueda de estaciones. Las estaciones más lejanas se ignoran.",
           "wind_entity": "Proporciona la dirección y la velocidad del viento (atributos wind_bearing y wind_speed).",
           "wind_fallback": "Se usa cuando la primera no tiene datos de viento.",
+          "wind_mode": "El viento a unos 1,5 km (Open-Meteo, 850 hPa) determina hacia dónde va una nube; el viento en superficie puede desviarse de 40 a 70 grados y es mucho más lento. Ambos: una estación está a barlovento si cualquiera de los dos apunta hacia ella.",
           "abs_threshold": "Una estación a partir de este valor siempre es llamativa.",
           "median_factor": "Una estación es llamativa si supera mediana x factor y mediana + distancia mínima.",
           "median_offset": "Una estación es llamativa si supera mediana x factor y mediana + distancia mínima.",
@@ -73,6 +77,15 @@
     },
     "error": {
       "far_not_larger": "El radio lejano debe ser mayor que el radio cercano."
+    }
+  },
+  "selector": {
+    "wind_mode": {
+      "options": {
+        "both": "Altura y superficie (recomendado)",
+        "upper": "Solo altura (Open-Meteo)",
+        "surface": "Solo superficie (entidad meteorológica)"
+      }
     }
   },
   "entity": {

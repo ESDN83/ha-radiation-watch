@@ -66,6 +66,24 @@ age (default 6 h) turn into grey rings and no longer count; when no current meas
 early warning switches to `unknown` and the message sensor says so, instead of reporting a false calm.
 The map images are stored locally and stay available.
 
+## Wind
+
+A radioactive plume travels with the wind at about 1 to 1.5 km height, rain washes it out from the
+clouds above. Near the ground the wind often turns by 40 to 70 degrees and is three to four times
+slower, so the surface wind alone gives wrong sectors and far too long arrival times.
+
+By default the integration therefore uses **three layers**: the wind at 850 hPa (about 1.5 km) and
+at cloud level, 700 hPa (about 3 km), from [Open-Meteo](https://open-meteo.com), plus your weather
+entity at the surface. A plume from a fire or explosion can rise to cloud level, and rain from there
+washes particles out; that layer is also what a rain radar shows moving. A station counts as upwind
+if any of the winds points to it, and the arrival time uses the fastest matching one. The map shows
+the 1.5 km wind as the shaded sector with travel time arcs, the cloud wind dotted and the surface
+wind dashed.
+
+Open-Meteo is free and open source, needs no key and is queried hourly with your location rounded to
+0.1 degrees (about 10 km). If it is not reachable, the surface wind is used and the card says so.
+*Configure* > *Wind for the warning* switches to height only or surface only.
+
 ## Setup
 
 | Option | Default | Meaning |
@@ -73,6 +91,7 @@ The map images are stored locally and stay available.
 | Latitude / longitude | your HA location | centre of the map |
 | Near radius | 40 km | radius of the near view |
 | Far radius | 120 km | radius of the far view and of the station search |
+| Wind for the warning | height and surface | see *Wind* below |
 | Weather entity for wind | none | any `weather.*` entity with `wind_bearing` and `wind_speed` |
 | Fallback weather entity | none | used when the first one has no wind data or reports less than the minimum wind speed (a garden anemometer often reads 0 at night while the regional wind still blows) |
 | Update interval | 30 min | the sources update hourly |
@@ -173,6 +192,7 @@ Pull requests with new languages are welcome.
 - Dose rates: [BfS ODL-Info / open data](https://odlinfo.bfs.de), licence
   [Datenlizenz Deutschland Namensnennung 2.0](https://www.govdata.de/dl-de/by-2-0).
   European values come from [EURDEP](https://remap.jrc.ec.europa.eu) via the same BfS service.
+- Wind aloft: [Open-Meteo.com](https://open-meteo.com), CC BY 4.0.
 - Map: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, ODbL.
   Tiles are fetched once per setup (about 50 to 100 tiles) with an identifying user agent,
   as the [tile usage policy](https://operations.osmfoundation.org/policies/tiles/) asks.

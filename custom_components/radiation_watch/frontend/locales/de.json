@@ -19,8 +19,12 @@
   },
   "wind": {
     "from": "Wind aus {dir}",
-    "hint": "Der blaue Bereich zeigt die Stationen, deren Luft zu uns zieht, die Bögen, wie lange sie bis hierher braucht.",
-    "none": "Wind zu schwach oder ohne Daten: keine Zugrichtung."
+    "hint": "Blauer Bereich: woher die Luft in 1,5 km Höhe kommt; gepunktet: Wolken in 3 km; gestrichelt: Boden. Eine Station in einem davon gilt als im Wind. Die Bögen zeigen, wie lange die Luft bis hierher braucht.",
+    "none": "Wind zu schwach oder ohne Daten: keine Zugrichtung.",
+    "upper": "Wind in 1,5 km Höhe aus {dir}",
+    "surface": "Boden: {dir}, {kmh} km/h.",
+    "cloud": "Wolken (3 km): aus {dir}.",
+    "surface_only": "Nur Bodenwind, Höhenwind nicht verfügbar."
   },
   "home": "Haus (Quadrat, 1h-Mittel)",
   "no_value": "ohne Wert",

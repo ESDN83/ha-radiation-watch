@@ -56,7 +56,7 @@ def _background():
 
 
 def test_calm():
-    r = geo.evaluate(_background(), *HOME, 270, 20, geo.Rules())
+    r = geo.evaluate(_background(), *HOME, [geo.Wind(270, 20)], geo.Rules())
     assert r.state == "calm"
     assert r.median == pytest.approx(0.11)
 
@@ -64,7 +64,7 @@ def test_calm():
 def test_notable_but_not_upwind():
     # Euskirchen lies east-south-east, wind from west: notable only.
     stations = _background() + [st("Euskirchen", 50.66, 6.79, 0.5)]
-    r = geo.evaluate(stations, *HOME, 270, 20, geo.Rules())
+    r = geo.evaluate(stations, *HOME, [geo.Wind(270, 20)], geo.Rules())
     assert r.state == "notable"
     assert r.upwind == []
     assert r.notable[0]["name"] == "Euskirchen"
@@ -73,7 +73,7 @@ def test_notable_but_not_upwind():
 def test_warning_upwind_with_eta():
     # Tihange lies about 90 km west-south-west, wind from 255 degrees at 15 km/h.
     stations = _background() + [st("Tihange", 50.53, 5.27, 0.9, "BE")]
-    r = geo.evaluate(stations, *HOME, 255, 15, geo.Rules())
+    r = geo.evaluate(stations, *HOME, [geo.Wind(255, 15)], geo.Rules())
     assert r.state == "warning"
     hit = r.upwind[0]
     assert hit["country"] == "BE"
@@ -83,14 +83,14 @@ def test_warning_upwind_with_eta():
 
 def test_no_warning_in_calm_air():
     stations = _background() + [st("Tihange", 50.53, 5.27, 0.9, "BE")]
-    r = geo.evaluate(stations, *HOME, 255, 1.0, geo.Rules())  # below min_wind
+    r = geo.evaluate(stations, *HOME, [geo.Wind(255, 1.0)], geo.Rules())  # below min_wind
     assert r.state == "notable"
 
 
 def test_relative_rise_counts_below_absolute_threshold():
     # 0.25 is below 0.3 but above median 0.11 + 0.1.
     stations = _background() + [st("Simmerath", 50.6, 6.3, 0.25)]
-    r = geo.evaluate(stations, *HOME, 225, 10, geo.Rules())
+    r = geo.evaluate(stations, *HOME, [geo.Wind(225, 10)], geo.Rules())
     assert r.state == "warning"
 
 
@@ -103,3 +103,28 @@ def test_wind_units():
 def test_zoom_levels():
     assert geo.zoom_for(40, 1024, 50.7) == 10
     assert geo.zoom_for(120, 1024, 50.7) == 9
+
+
+def test_upper_or_surface_wind_and_fastest_eta():
+    # Tihange lies at about 256 degrees. Surface wind from 220 (36 degrees off, inside +-45) and
+    # upper wind from 260 at 60 km/h both match; the faster one gives the earlier arrival.
+    stations = _background() + [st("Tihange", 50.53, 5.27, 0.9, "BE")]
+    winds = [geo.Wind(260, 60, "upper"), geo.Wind(220, 15, "surface")]
+    r = geo.evaluate(stations, *HOME, winds, geo.Rules())
+    hit = r.upwind[0]
+    assert hit["wind"] == "upper"
+    assert hit["eta_min"] == pytest.approx(hit["distance_km"] / 60 * 60, abs=1)
+
+
+def test_only_upper_wind_matches():
+    # Surface wind from the south-east would miss Tihange, the upper wind from the west catches it.
+    stations = _background() + [st("Tihange", 50.53, 5.27, 0.9, "BE")]
+    r = geo.evaluate(stations, *HOME, [geo.Wind(135, 15, "surface"), geo.Wind(270, 55, "upper")], geo.Rules())
+    assert r.state == "warning"
+    assert r.upwind[0]["wind"] == "upper"
+
+
+def test_no_wind_at_all():
+    stations = _background() + [st("Tihange", 50.53, 5.27, 0.9, "BE")]
+    r = geo.evaluate(stations, *HOME, [], geo.Rules())
+    assert r.state == "notable"

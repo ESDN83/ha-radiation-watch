@@ -66,6 +66,10 @@ age (default 6 h) turn into grey rings and no longer count; when no current meas
 early warning switches to `unknown` and the message sensor says so, instead of reporting a false calm.
 The map images are stored locally and stay available.
 
+The same applies when only one source fails (the German network or EURDEP): its stations keep their
+last values while the other source stays current. The station list is saved, so Home Assistant also
+starts during an outage and shows the saved stations; it does not wait for the data service.
+
 ## Wind
 
 A radioactive plume travels with the wind at about 1 to 1.5 km height, rain washes it out from the

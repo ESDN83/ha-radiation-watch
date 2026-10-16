@@ -150,12 +150,13 @@ async def _async_register_card_resource(hass: HomeAssistant, card_url: str) -> b
 async def async_setup_entry(hass: HomeAssistant, entry: RadiationWatchConfigEntry) -> bool:
     settings = merged_settings(hass, entry)
     coordinator = StationCoordinator(hass, entry, settings)
-    await coordinator.async_config_entry_first_refresh()
+    # Setup does not wait for the data services: when BfS was down at startup (15.10.2026, its
+    # database pool was exhausted), waiting got the setup cancelled and HA never retried.
+    await coordinator.async_load_saved()
     entry.runtime_data = RuntimeData(coordinator=coordinator, settings=settings)
     upper = None
     if settings["wind_mode"] != "surface":
         upper = UpperWindCoordinator(hass, entry, settings["latitude"], settings["longitude"])
-        await upper.async_refresh()  # no first_refresh: setup must not fail when Open-Meteo is down
     entry.runtime_data.upper_wind = upper
     texts = await hass.async_add_executor_job(load_messages, hass.config.language)
     entry.runtime_data.engine = WarningEngine(hass, entry, settings, coordinator, texts, upper)
@@ -174,6 +175,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: RadiationWatchConfigEntr
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     # Start after the entities exist, so a warning present at startup reaches the event entity too.
     entry.runtime_data.engine.async_start()
+    entry.async_create_background_task(hass, coordinator.async_refresh(), f"{DOMAIN}_first_stations")
+    if upper:
+        entry.async_create_background_task(hass, upper.async_refresh(), f"{DOMAIN}_first_upper_wind")
     entry.async_on_unload(entry.add_update_listener(_async_options_updated))
     return True
 

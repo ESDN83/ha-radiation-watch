@@ -62,7 +62,7 @@ class StationsSensor(CoordinatorEntity[StationCoordinator], SensorEntity):
         return {
             # Compact: [name, latitude, longitude, uSv/h, country, measured (epoch s)]
             "stations": [[s.name, s.latitude, s.longitude, s.value, s.country, int(s.measured or 0)] for s in d.stations],
-            "fetched_at": d.fetched_at.isoformat(),
+            "fetched_at": d.fetched_at.isoformat() if d.fetched_at else None,
         }
 
 
@@ -161,7 +161,7 @@ class EarlyWarningSensor(EngineEntity, SensorEntity):
             "data_time": st.data_time,
             "maps": maps,
             "map_status": rd.map_status,
-            "fetched_at": self._entry.runtime_data.coordinator.data.fetched_at.isoformat(),
+            "fetched_at": rd.coordinator.data.fetched_at.isoformat() if rd.coordinator.data.fetched_at else None,
         }
 
 

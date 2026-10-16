@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+import json
 import logging
 import math
+import re
 
 import aiohttp
 
@@ -14,8 +16,13 @@ from .geo import KM_PER_DEG_LAT, Station, distance_bearing
 _LOGGER = logging.getLogger(__name__)
 
 
-class RadiationApiError(Exception):
-    """Both data sources failed."""
+def parse_body(text: str) -> dict:
+    """GeoJSON from the service. On a server fault GeoServer answers 200 with an XML
+    ExceptionReport instead; its first line goes into the error instead of a JSON parse error."""
+    if text.lstrip().startswith("<"):
+        m = re.search(r"<ows:ExceptionText>\s*([^\n<]*)", text)
+        raise ValueError(f"service error: {m.group(1).strip() if m else 'no GeoJSON in the answer'}")
+    return json.loads(text)
 
 
 def _bbox(lat: float, lon: float, radius_km: float) -> str:
@@ -73,20 +80,23 @@ def parse_features(
     return out
 
 
+SOURCE_EURDEP = "eurdep"
+SOURCE_ODL_DE = "odl_de"
+
+
 async def async_fetch_stations(
     session: aiohttp.ClientSession, lat: float, lon: float, radius_km: float, max_age_h: float
-) -> list[Station]:
-    """Fetch both layers. One failing source is tolerated, both failing raises."""
+) -> dict[str, list[Station] | None]:
+    """Fetch both layers. Per source the stations, or None when that source failed."""
     bbox = _bbox(lat, lon, radius_km)
     # EURDEP lists each station once per analysis window (6/12/24/48/72 h) with the same value.
     sources = [
-        (LAYER_EURDEP, f"analyzed_range_in_h=6 AND BBOX(geom,{bbox})", True),
-        (LAYER_ODL_DE, f"site_status=1 AND BBOX(geom,{bbox})", False),
+        (SOURCE_EURDEP, LAYER_EURDEP, f"analyzed_range_in_h=6 AND BBOX(geom,{bbox})", True),
+        (SOURCE_ODL_DE, LAYER_ODL_DE, f"site_status=1 AND BBOX(geom,{bbox})", False),
     ]
     now = datetime.now(timezone.utc)
-    stations: list[Station] = []
-    errors = 0
-    for layer, cql, eurdep in sources:
+    result: dict[str, list[Station] | None] = {}
+    for key, layer, cql, eurdep in sources:
         try:
             async with session.get(
                 WFS_URL,
@@ -95,12 +105,10 @@ async def async_fetch_stations(
                 timeout=aiohttp.ClientTimeout(total=45),
             ) as resp:
                 resp.raise_for_status()
-                data = await resp.json(content_type=None)
+                data = parse_body(await resp.text())
         except (aiohttp.ClientError, TimeoutError, ValueError) as err:
-            errors += 1
             _LOGGER.warning("Fetching %s failed: %s", layer, err)
+            result[key] = None
             continue
-        stations.extend(parse_features(data.get("features") or [], eurdep, lat, lon, radius_km, max_age_h, now))
-    if errors == len(sources):
-        raise RadiationApiError("No data source reachable")
-    return stations
+        result[key] = parse_features(data.get("features") or [], eurdep, lat, lon, radius_km, max_age_h, now)
+    return result

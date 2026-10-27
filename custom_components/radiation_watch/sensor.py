@@ -144,6 +144,8 @@ class EarlyWarningSensor(EngineEntity, SensorEntity):
             "cloud_wind_bearing": st.upper.bearing_700 if st.upper else None,
             "cloud_wind_kmh": round(st.upper.kmh_700, 1) if st.upper and st.upper.kmh_700 is not None else None,
             "upper_wind_time": st.upper.valid_for.isoformat() if st.upper else None,
+            # Set while no fresh poll came for 3 h: the wind aloft is taken from this older forecast.
+            "upper_wind_forecast_from": st.upper.fetched_at.isoformat() if st.upper and st.upper.from_forecast else None,
             "median": r.median if r else None,
             "limit": r.limit if r else None,
             "notable_count": len(r.notable) if r else 0,

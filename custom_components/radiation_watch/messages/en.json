@@ -19,5 +19,6 @@
   "more": "and {n} more",
   "calm": "All stations within {km} km are in the normal range.",
   "title_no_data": "Radiation: no current data",
-  "no_data": "No current measurements. Internet or the data service is not reachable, the warning is paused."
+  "no_data": "No current measurements. Internet or the data service is not reachable, the warning is paused.",
+  "forecast_wind": "Wind from the forecast, no current data:"
 }

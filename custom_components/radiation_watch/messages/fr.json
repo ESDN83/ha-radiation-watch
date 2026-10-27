@@ -19,5 +19,6 @@
   "more": "et {n} autres",
   "calm": "Toutes les stations dans un rayon de {km} km sont dans la plage normale.",
   "title_no_data": "Radiation : pas de données actuelles",
-  "no_data": "Pas de mesures actuelles. Internet ou le service de données est injoignable, l'alerte est en pause."
+  "no_data": "Pas de mesures actuelles. Internet ou le service de données est injoignable, l'alerte est en pause.",
+  "forecast_wind": "Vent selon la prévision, pas de données actuelles :"
 }

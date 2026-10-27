@@ -62,9 +62,13 @@ def _join(t: dict, items: list[str], limit: int = 255) -> str:
     return text
 
 
-def build_message(t: dict, result: Evaluation, radius_far: float) -> tuple[str, str]:
-    """(title, text) for the current level. Text stays under 255 characters for a sensor state."""
+def build_message(t: dict, result: Evaluation, radius_far: float, forecast: bool = False) -> tuple[str, str]:
+    """(title, text) for the current level. Text stays under 255 characters for a sensor state.
+
+    forecast: the wind aloft comes from an older forecast (no internet), which the text says first.
+    """
     comma = t.get("decimal_comma", False)
+    prefix = f"{t['forecast_wind']} " if forecast and result.state != STATE_CALM else ""
     dirs = t.get("directions", DIRECTIONS)
     if result.state == STATE_WARNING:
         items = [
@@ -76,7 +80,7 @@ def build_message(t: dict, result: Evaluation, radius_far: float) -> tuple[str, 
             )
             for i in result.upwind
         ]
-        return t["title_warning"], _join(t, items)
+        return t["title_warning"], prefix + _join(t, items, 255 - len(prefix))
     if result.state == STATE_NOTABLE:
         items = [
             t["notable_item"].format(
@@ -87,7 +91,7 @@ def build_message(t: dict, result: Evaluation, radius_far: float) -> tuple[str, 
             )
             for i in result.notable
         ]
-        return t["title_notable"], _join(t, items)
+        return t["title_notable"], prefix + _join(t, items, 255 - len(prefix))
     return t["title_calm"], t["calm"].format(km=_fmt(radius_far, 0, comma))
 
 
@@ -207,7 +211,8 @@ class WarningEngine:
 
         result = evaluate(fresh, s["latitude"], s["longitude"], st.winds, rules)
         st.result = result
-        st.title, st.message = build_message(self.texts, result, s["radius_far"])
+        forecast = bool(st.upper and st.upper.from_forecast and s["wind_mode"] != "surface")
+        st.title, st.message = build_message(self.texts, result, s["radius_far"], forecast)
 
         previous, st.last_level = st.last_level, result.state
         if previous != result.state:

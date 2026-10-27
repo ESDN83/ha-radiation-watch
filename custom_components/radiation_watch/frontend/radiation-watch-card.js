@@ -10,7 +10,7 @@
  * Texts live in locales/<lang>.json next to this file, English is the fallback.
  */
 
-const CARD_VERSION = "0.3.2";
+const CARD_VERSION = "0.3.3";
 const BASE = "/radiation_watch_files/frontend";
 const LOCALES = {};
 const LOADING = {};
@@ -385,6 +385,9 @@ class RadiationWatchCard extends HTMLElement {
         + (sw && a.upper_wind_bearing != null && a.wind_mode !== "surface" ? ` ${esc(this._t("wind.surface", { dir: dn(sw.b), kmh: f(sw.k, 0) }))}` : "")
         + (typeof a.cloud_wind_bearing === "number" && a.wind_mode !== "surface" ? ` ${esc(this._t("wind.cloud", { dir: dn(a.cloud_wind_bearing) }))}` : "")
         + (a.upper_wind_bearing == null && a.wind_mode !== "surface" ? ` <i>${esc(this._t("wind.surface_only"))}</i>` : "")
+        + (a.upper_wind_forecast_from && a.wind_mode !== "surface"
+          ? ` <b style="color:${c.color_warn}">${esc(this._t("wind.forecast", { t: tfmt(Date.parse(a.upper_wind_forecast_from) / 1000) }))}</b>`
+          : "")
         + ` ${esc(this._t("wind.hint"))}`
       : `<br>${esc(this._t("wind.none"))}`;
     if (own.length) t += `<br>${esc(this._t("home"))}: ${own.map((x) => (isNaN(x.v) ? `${esc(x.name)} ${esc(this._t("no_value"))}` : `${dot(col(x.v))}${esc(x.name)} ${f(x.v, 3)}`)).join(" ")} µSv/h`;

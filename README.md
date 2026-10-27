@@ -85,7 +85,12 @@ the 1.5 km wind as the shaded sector with travel time arcs, the cloud wind dotte
 wind dashed.
 
 Open-Meteo is free and open source, needs no key and is queried hourly with your location rounded to
-0.1 degrees (about 10 km). If it is not reachable, the surface wind is used and the card says so.
+0.1 degrees (about 10 km). Each poll loads the forecast for the next 72 hours and saves it. If
+Open-Meteo is not reachable for more than 3 hours, for example because an incident took the internet
+down, the saved forecast for the current hour is used instead: better than no wind aloft at all.
+The card then names the time of that forecast, the attribute `upper_wind_forecast_from` is set and
+warning messages start with a note that the wind comes from the forecast. Once the forecast has run
+out, only the surface wind is left and the card says so.
 *Configure* > *Wind for the warning* switches to height only or surface only.
 
 ## Setup

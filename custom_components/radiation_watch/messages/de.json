@@ -19,5 +19,6 @@
   "more": "und {n} weitere",
   "calm": "Alle Stationen bis {km} km im normalen Bereich.",
   "title_no_data": "Strahlung: keine aktuellen Daten",
-  "no_data": "Keine aktuellen Messwerte. Internet oder Datendienst nicht erreichbar, die Frühwarnung pausiert."
+  "no_data": "Keine aktuellen Messwerte. Internet oder Datendienst nicht erreichbar, die Frühwarnung pausiert.",
+  "forecast_wind": "Wind laut Vorhersage, keine aktuellen Daten:"
 }

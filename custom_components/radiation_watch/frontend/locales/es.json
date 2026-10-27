@@ -24,7 +24,8 @@
     "upper": "Viento a 1,5 km del {dir}",
     "surface": "Superficie: {dir}, {kmh} km/h.",
     "cloud": "Nubes (3 km): del {dir}.",
-    "surface_only": "Solo viento en superficie, viento en altura no disponible."
+    "surface_only": "Solo viento en superficie, viento en altura no disponible.",
+    "forecast": "Viento en altura según el pronóstico de {t}: sin datos actuales, el viento puede variar."
   },
   "home": "Hogar (cuadrado, media 1 h)",
   "no_value": "sin valor",

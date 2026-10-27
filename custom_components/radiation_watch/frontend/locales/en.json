@@ -24,7 +24,8 @@
     "upper": "Wind at 1.5 km from {dir}",
     "surface": "Surface: {dir}, {kmh} km/h.",
     "cloud": "Clouds (3 km): from {dir}.",
-    "surface_only": "Surface wind only, wind aloft not available."
+    "surface_only": "Surface wind only, wind aloft not available.",
+    "forecast": "Wind aloft from the forecast of {t}: no current data, the wind may differ."
   },
   "home": "Home (square, 1 h mean)",
   "no_value": "no value",

@@ -157,6 +157,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: RadiationWatchConfigEntr
     upper = None
     if settings["wind_mode"] != "surface":
         upper = UpperWindCoordinator(hass, entry, settings["latitude"], settings["longitude"])
+        await upper.async_load_saved()
     entry.runtime_data.upper_wind = upper
     texts = await hass.async_add_executor_job(load_messages, hass.config.language)
     entry.runtime_data.engine = WarningEngine(hass, entry, settings, coordinator, texts, upper)

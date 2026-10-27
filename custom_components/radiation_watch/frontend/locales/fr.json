@@ -24,7 +24,8 @@
     "upper": "Vent à 1,5 km du {dir}",
     "surface": "Sol : {dir}, {kmh} km/h.",
     "cloud": "Nuages (3 km) : du {dir}.",
-    "surface_only": "Vent au sol uniquement, vent en altitude indisponible."
+    "surface_only": "Vent au sol uniquement, vent en altitude indisponible.",
+    "forecast": "Vent en altitude selon la prévision de {t} : pas de données actuelles, le vent peut différer."
   },
   "home": "Domicile (carré, moyenne 1 h)",
   "no_value": "sans valeur",

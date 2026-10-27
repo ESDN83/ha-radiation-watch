@@ -24,7 +24,8 @@
     "upper": "Wind in 1,5 km Höhe aus {dir}",
     "surface": "Boden: {dir}, {kmh} km/h.",
     "cloud": "Wolken (3 km): aus {dir}.",
-    "surface_only": "Nur Bodenwind, Höhenwind nicht verfügbar."
+    "surface_only": "Nur Bodenwind, Höhenwind nicht verfügbar.",
+    "forecast": "Höhenwind aus der Vorhersage von {t}: keine aktuellen Daten, der Wind kann abweichen."
   },
   "home": "Haus (Quadrat, 1h-Mittel)",
   "no_value": "ohne Wert",

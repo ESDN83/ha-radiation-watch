@@ -19,5 +19,6 @@
   "more": "y {n} más",
   "calm": "Todas las estaciones en {km} km están en el rango normal.",
   "title_no_data": "Radiación: sin datos actuales",
-  "no_data": "Sin mediciones actuales. Internet o el servicio de datos no está disponible, la alerta está en pausa."
+  "no_data": "Sin mediciones actuales. Internet o el servicio de datos no está disponible, la alerta está en pausa.",
+  "forecast_wind": "Viento según el pronóstico, sin datos actuales:"
 }

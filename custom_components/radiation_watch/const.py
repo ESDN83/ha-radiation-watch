@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 DOMAIN = "radiation_watch"
-VERSION = "0.3.3"
+VERSION = "0.3.4"
 
 # Config entry keys
 CONF_LATITUDE = "latitude"
@@ -23,6 +23,7 @@ CONF_NOTIFY_SERVICES = "notify_services"
 CONF_NOTIFY_NOTABLE = "notify_notable"
 CONF_NOTIFY_ALL_CLEAR = "notify_all_clear"
 CONF_WIND_MODE = "wind_mode"
+CONF_USE_TELERAD = "use_telerad"
 WIND_MODES = ["both", "upper", "surface"]  # upper = Open-Meteo 850 hPa
 DEFAULT_WIND_MODE = "both"
 
@@ -42,11 +43,13 @@ STATE_NOTABLE = "notable"
 STATE_WARNING = "warning"
 WARNING_STATES = [STATE_CALM, STATE_NOTABLE, STATE_WARNING]
 
-# Open WFS service of the German Federal Office for Radiation Protection (BfS).
-# It serves the German ODL network and the European EURDEP exchange.
+# Open WFS service of the German Federal Office for Radiation Protection (BfS), German ODL network.
+# Its EURDEP layer for the other European countries was removed on 28.10.2026 without notice.
 WFS_URL = "https://www.imis.bfs.de/ogc/opendata/ows"
-LAYER_EURDEP = "opendata:eurdep_latestValue"
 LAYER_ODL_DE = "opendata:odlinfo_odl_1h_latest"
+# Public map service of the Belgian nuclear regulator FANC behind telerad.be. Optional: it has no
+# published terms of reuse and no documented interface.
+TELERAD_URL = "https://services2.arcgis.com/u7PyKqO7hEPx3GAs/arcgis/rest/services/Station_WebProj2_1_PROD/FeatureServer/0/query"
 
 # URLs served by the integration
 URL_BASE = "/radiation_watch_files"
@@ -60,4 +63,5 @@ MAP_DIR = "radiation_watch"  # below the HA config directory
 TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 USER_AGENT = f"ha-radiation-watch/{VERSION} (+https://github.com/ESDN83/ha-radiation-watch)"
 ATTRIBUTION_MAP = "© OpenStreetMap contributors"
-ATTRIBUTION_DATA = "BfS, EURDEP"
+ATTRIBUTION_DATA = "BfS"
+ATTRIBUTION_TELERAD = "FANC TELERAD"

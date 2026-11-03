@@ -29,6 +29,7 @@ from .const import (
     CONF_NOTIFY_ALL_CLEAR,
     CONF_NOTIFY_NOTABLE,
     CONF_NOTIFY_SERVICES,
+    CONF_USE_TELERAD,
     CONF_WIND_MODE,
     DEFAULT_WIND_MODE,
     CONF_RADIUS_FAR,
@@ -99,6 +100,7 @@ def merged_settings(hass: HomeAssistant, entry: ConfigEntry) -> dict:
         "notify_notable": bool(c.get(CONF_NOTIFY_NOTABLE, False)),
         "notify_all_clear": bool(c.get(CONF_NOTIFY_ALL_CLEAR, True)),
         "wind_mode": c.get(CONF_WIND_MODE, DEFAULT_WIND_MODE),
+        "use_telerad": bool(c.get(CONF_USE_TELERAD, False)),
     }
 
 

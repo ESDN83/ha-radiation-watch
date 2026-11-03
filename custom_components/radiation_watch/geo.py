@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 import math
 
 KM_PER_DEG_LAT = 111.2
@@ -150,3 +151,34 @@ def zoom_for(radius_km: float, size_px: int, lat: float) -> int:
     equator_km_per_px_z0 = 40075.016686 * math.cos(math.radians(lat)) / 256
     z = round(math.log2(equator_km_per_px_z0 / km_per_px))
     return max(5, min(14, z))
+
+
+def parse_telerad(features: list[dict], lat: float, lon: float, radius_km: float, max_age_h: float, now: float) -> list[Station]:
+    """Air stations from the FANC TELERAD service, now in epoch seconds.
+
+    River water stations report cps, not a dose rate, even the ones named after Tihange: only
+    type L in microSv/h counts. Stations out of service keep an old value, so they are dropped too.
+
+    IMR stations stand on the sites of the plants themselves. Their normal level is local: IMR/T15
+    at Tihange reads a steady 0.32 to 0.39 uSv/h, which would be a false warning with every west
+    wind. IMA stations around the sites read a normal 0.08 to 0.11 and show a real plume just as well.
+    """
+    oldest = now - max_age_h * 3600
+    out: list[Station] = []
+    for f in features:
+        a = f.get("attributes") or {}
+        value, s_lat, s_lon = a.get("Station_Value"), a.get("Lat"), a.get("Lon")
+        if a.get("StationType") != "L" or a.get("Unite") != "microSv/h" or a.get("InServiceNL") != "Operationeel":
+            continue
+        if str(a.get("Name")).startswith("IMR/"):
+            continue
+        if not all(isinstance(x, (int, float)) for x in (value, s_lat, s_lon)) or value <= 0:
+            continue
+        try:
+            measured = datetime.strptime(str(a.get("Date_Time")), "%Y-%m-%d %H:%M:%S UTC").replace(tzinfo=timezone.utc).timestamp()
+        except ValueError:
+            continue
+        if measured < oldest or distance_bearing(lat, lon, s_lat, s_lon)[0] > radius_km:
+            continue
+        out.append(Station(str(a.get("Location") or a.get("Name") or "?").replace("�", "?"), float(s_lat), float(s_lon), float(value), "BE", measured))
+    return out

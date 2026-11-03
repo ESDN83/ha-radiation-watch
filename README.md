@@ -15,8 +15,8 @@ wind from the west with travel time arcs (1 h to 4 h).
 The stations get red rings, the card lists the estimated arrival times.
 
 - Pulls the latest values of all stations within a radius you choose (default 120 km) from the open
-  WFS service of the German Federal Office for Radiation Protection (BfS). It covers the German ODL
-  network and the European **EURDEP** exchange (Belgium, Netherlands, Luxembourg, France and more).
+  WFS service of the German Federal Office for Radiation Protection (BfS), which covers the German
+  ODL network. Optionally adds the Belgian **TELERAD** stations, see below.
 - **Early warning sensor** with three states: `calm`, `notable` (a station clearly above the others),
   `warning` (such a station lies upwind, so its air is heading your way). Details such as station,
   distance and estimated arrival time are in the attributes.
@@ -50,23 +50,30 @@ Copy `custom_components/radiation_watch` into your `config/custom_components` fo
 ## Where the stations come from
 
 Nothing to configure: the integration takes your Home Assistant location (or the point you
-enter) and fetches **every station within the far radius** from the open BfS WFS service:
+enter) and fetches **every station within the far radius**:
 
 - **Germany**: the BfS ODL network (about 1,700 probes), layer `odlinfo_odl_1h_latest`.
-- **All other European countries**: the EURDEP exchange (about 5,000 stations, for example
-  Belgium, Netherlands, Luxembourg, France, Austria, Switzerland, Czechia, Poland), layer
-  `eurdep_latestValue`. BfS republishes it without the German stations, so nothing is counted twice.
+- **Belgium, optional and off by default**: *Configure* > *Add Belgian stations* reads the hourly
+  values of the air stations from the public map service of the regulator FANC behind
+  [telerad.be](https://www.telerad.be). The service has no published terms of reuse and no documented
+  interface, so it is meant for private use and may change without notice. Stations on the plant
+  sites themselves (IMR) are left out: their normal level is locally elevated and would raise false
+  warnings. The stations around the sites (IMA) and the national network (IMN) are used.
+
+**Other countries are not covered.** BfS used to republish the European EURDEP exchange as well, but
+removed that layer on 28 October 2026 without notice. Near a border this means less lead time from
+that side. I found no open source for current values of the Netherlands, Luxembourg or France.
 
 Move the location or change the radius and the station list follows on the next update.
 No other integration is needed (the separate *BfS ODL* integration is not used).
-Outside Europe there are no stations in these sources.
+Outside Germany and Belgium there are no stations in these sources.
 
 **Without internet** the last station list stays on the map. Measurements older than the maximum data
 age (default 6 h) turn into grey rings and no longer count; when no current measurement is left, the
 early warning switches to `unknown` and the message sensor says so, instead of reporting a false calm.
 The map images are stored locally and stay available.
 
-The same applies when only one source fails (the German network or EURDEP): its stations keep their
+The same applies when only one source fails (the German network or TELERAD): its stations keep their
 last values while the other source stays current. The station list is saved, so Home Assistant also
 starts during an outage and shows the saved stations; it does not wait for the data service.
 
@@ -200,7 +207,8 @@ Pull requests with new languages are welcome.
 
 - Dose rates: [BfS ODL-Info / open data](https://odlinfo.bfs.de), licence
   [Datenlizenz Deutschland Namensnennung 2.0](https://www.govdata.de/dl-de/by-2-0).
-  European values come from [EURDEP](https://remap.jrc.ec.europa.eu) via the same BfS service.
+- Belgian dose rates, if switched on: [TELERAD](https://www.telerad.be) by FANC/AFCN. No licence is published, the
+  data stay with FANC.
 - Wind aloft: [Open-Meteo.com](https://open-meteo.com), CC BY 4.0.
 - Map: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, ODbL.
   Tiles are fetched once per setup (about 50 to 100 tiles) with an identifying user agent,

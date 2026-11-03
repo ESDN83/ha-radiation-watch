@@ -36,9 +36,9 @@
     "rings": "Yellow ring: notable. Red ring: notable and upwind."
   },
   "eta": "{name}, {km} km upwind: arrives about {eta} after the measurement.",
-  "eta_note": "Values are up to 1.5 h old (EURDEP about 2 h), so it may arrive earlier.",
+  "eta_note": "Values are up to 1.5 h old, so it may arrive earlier.",
   "map_building": "Map images are being built, this takes a minute.",
-  "attribution": "Map © OpenStreetMap contributors · Data BfS, EURDEP",
+  "attribution": "Map © OpenStreetMap contributors · Data BfS",
   "status": {
     "calm": {
       "title": "Early warning: calm",

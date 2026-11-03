@@ -10,7 +10,7 @@
  * Texts live in locales/<lang>.json next to this file, English is the fallback.
  */
 
-const CARD_VERSION = "0.3.3";
+const CARD_VERSION = "0.3.4";
 const BASE = "/radiation_watch_files/frontend";
 const LOCALES = {};
 const LOADING = {};
@@ -352,7 +352,7 @@ class RadiationWatchCard extends HTMLElement {
     const ov = own.filter((x) => !isNaN(x.v)).map((x) => x.v);
     const hm = ov.length ? Math.max(...ov) : null;
     o += `<rect x="${C - 7}" y="${C - 7}" width="14" height="14" rx="3" style="fill:${hm === null ? "var(--secondary-text-color)" : col(hm)};stroke:${label};stroke-width:2"/>`;
-    o += `<text x="${C + R}" y="${C + R + 8}" text-anchor="end" style="font-size:7px;fill:var(--secondary-text-color)">${esc(this._t("attribution"))}${a.attribution_wind ? " · Wind Open-Meteo.com" : ""}</text></svg>`;
+    o += `<text x="${C + R}" y="${C + R + 8}" text-anchor="end" style="font-size:7px;fill:var(--secondary-text-color)">${esc(this._t("attribution"))}${a.attribution_stations ? `, ${esc(a.attribution_stations)}` : ""}${a.attribution_wind ? " · Wind Open-Meteo.com" : ""}</text></svg>`;
 
     // Info box for the tapped station
     let info = "";

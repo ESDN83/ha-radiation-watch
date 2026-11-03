@@ -36,9 +36,9 @@
     "rings": "Anillo amarillo: llamativo. Anillo rojo: llamativo y a barlovento."
   },
   "eta": "{name}, {km} km a barlovento: llega unos {eta} después de la medición.",
-  "eta_note": "Los valores tienen hasta 1,5 h (EURDEP unas 2 h), así que puede llegar antes.",
+  "eta_note": "Los valores tienen hasta 1,5 h, así que puede llegar antes.",
   "map_building": "Se están generando las imágenes del mapa, tarda alrededor de un minuto.",
-  "attribution": "Mapa © colaboradores de OpenStreetMap · Datos BfS, EURDEP",
+  "attribution": "Mapa © colaboradores de OpenStreetMap · Datos BfS",
   "status": {
     "calm": {
       "title": "Alerta temprana: tranquilo",

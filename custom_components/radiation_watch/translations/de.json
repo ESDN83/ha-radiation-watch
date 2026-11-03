@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Radiation Watch",
-        "description": "Messstationen der Ortsdosisleistung rund um dein Zuhause (BfS-Messnetz und europäisches EURDEP), Frühwarnung nach Windrichtung und eine Kartenkarte. Die Kartenkacheln werden einmalig von OpenStreetMap geladen und danach lokal ausgeliefert.",
+        "description": "Messstationen der Ortsdosisleistung rund um dein Zuhause (BfS-Messnetz, optional belgisches TELERAD), Frühwarnung nach Windrichtung und eine Kartenkarte. Die Kartenkacheln werden einmalig von OpenStreetMap geladen und danach lokal ausgeliefert.",
         "data": {
           "latitude": "Breitengrad",
           "longitude": "Längengrad",
@@ -12,6 +12,7 @@
           "wind_entity": "Wetter-Entität für den Wind",
           "wind_fallback": "Ersatz-Wetter-Entität",
           "wind_mode": "Wind für die Warnung",
+          "use_telerad": "Belgische Stationen ergänzen (TELERAD, FANC)",
           "scan_interval": "Abrufintervall"
         },
         "data_description": {
@@ -20,7 +21,8 @@
           "radius_far": "Radius der Weit-Ansicht und der Stationssuche. Weiter entfernte Stationen werden ignoriert.",
           "wind_entity": "Liefert Windrichtung und Windgeschwindigkeit (Attribute wind_bearing und wind_speed).",
           "wind_fallback": "Wird genutzt, wenn die erste keine Winddaten hat.",
-          "wind_mode": "Wind in etwa 1,5 km Höhe (Open-Meteo, 850 hPa) bestimmt, wohin eine Wolke zieht; der Bodenwind weicht oft um 40 bis 70 Grad ab und ist viel langsamer. Beide: Eine Station gilt als im Wind, wenn einer der beiden auf sie zeigt."
+          "wind_mode": "Wind in etwa 1,5 km Höhe (Open-Meteo, 850 hPa) bestimmt, wohin eine Wolke zieht; der Bodenwind weicht oft um 40 bis 70 Grad ab und ist viel langsamer. Beide: Eine Station gilt als im Wind, wenn einer der beiden auf sie zeigt.",
+          "use_telerad": "Optional, für die private Nutzung. Stündliche Werte der belgischen Luftstationen aus dem öffentlichen Kartendienst der Aufsichtsbehörde FANC. Es gibt keine veröffentlichten Nutzungsbedingungen und keine dokumentierte Schnittstelle, der Dienst kann sich jederzeit ändern."
         }
       }
     },
@@ -45,6 +47,7 @@
           "wind_entity": "Wetter-Entität für den Wind",
           "wind_fallback": "Ersatz-Wetter-Entität",
           "wind_mode": "Wind für die Warnung",
+          "use_telerad": "Belgische Stationen ergänzen (TELERAD, FANC)",
           "scan_interval": "Abrufintervall",
           "abs_threshold": "Absolute Schwelle",
           "median_factor": "Faktor über dem Median",
@@ -63,6 +66,7 @@
           "wind_entity": "Liefert Windrichtung und Windgeschwindigkeit (Attribute wind_bearing und wind_speed).",
           "wind_fallback": "Wird genutzt, wenn die erste keine Winddaten hat.",
           "wind_mode": "Wind in etwa 1,5 km Höhe (Open-Meteo, 850 hPa) bestimmt, wohin eine Wolke zieht; der Bodenwind weicht oft um 40 bis 70 Grad ab und ist viel langsamer. Beide: Eine Station gilt als im Wind, wenn einer der beiden auf sie zeigt.",
+          "use_telerad": "Optional, für die private Nutzung. Stündliche Werte der belgischen Luftstationen aus dem öffentlichen Kartendienst der Aufsichtsbehörde FANC. Es gibt keine veröffentlichten Nutzungsbedingungen und keine dokumentierte Schnittstelle, der Dienst kann sich jederzeit ändern.",
           "abs_threshold": "Eine Station ab diesem Wert ist immer auffällig.",
           "median_factor": "Eine Station ist auffällig, wenn sie über Median mal Faktor und über Median plus Mindestabstand liegt.",
           "median_offset": "Eine Station ist auffällig, wenn sie über Median mal Faktor und über Median plus Mindestabstand liegt.",

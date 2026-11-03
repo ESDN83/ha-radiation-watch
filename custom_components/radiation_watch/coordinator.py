@@ -12,7 +12,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .api import async_fetch_stations
+from .api import active_sources, async_fetch_stations
 from .const import DOMAIN
 from .geo import Station
 
@@ -42,9 +42,8 @@ def _row(x: Station) -> list:
 class StationCoordinator(DataUpdateCoordinator[StationData]):
     """Fetches all stations within the far radius.
 
-    Each source keeps its last good list when it fails, so an outage of one source (on
-    15./16.10.2026 the BfS database failed for EURDEP longer than for the German network)
-    does not wipe its stations from the map. Their measuring time stays, so the warning
+    Each source keeps its last good list when it fails, so an outage of one source does not
+    wipe its stations from the map. Their measuring time stays, so the warning
     engine greys them out once they are older than max_age. The lists are also saved to
     disk: after a restart during an outage the map shows the saved stations instead of
     nothing. A poll never fails hard, without any data the engine reports "no current data".
@@ -71,8 +70,10 @@ class StationCoordinator(DataUpdateCoordinator[StationData]):
         data = StationData(sources={}, fetched_at=None)
         if saved:
             try:
+                # Only active sources: not one that was switched off or no longer exists.
+                active = active_sources(self.settings["use_telerad"])
                 data = StationData(
-                    sources={k: [Station(*row) for row in rows] for k, rows in saved["sources"].items()},
+                    sources={k: [Station(*row) for row in rows] for k, rows in saved["sources"].items() if k in active},
                     fetched_at=datetime.fromisoformat(saved["fetched_at"]),
                 )
             except (KeyError, TypeError, ValueError, AttributeError) as err:
@@ -82,7 +83,7 @@ class StationCoordinator(DataUpdateCoordinator[StationData]):
     async def _async_update_data(self) -> StationData:
         s = self.settings
         fetched = await async_fetch_stations(
-            async_get_clientsession(self.hass), s["latitude"], s["longitude"], s["radius_far"], s["max_age"]
+            async_get_clientsession(self.hass), s["latitude"], s["longitude"], s["radius_far"], s["max_age"], s["use_telerad"]
         )
         answered = {k: v for k, v in fetched.items() if v is not None}
         if not answered:

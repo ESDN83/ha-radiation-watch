@@ -9,6 +9,7 @@ from pathlib import Path
 
 TEXT = {
     "en": dict(
+        tel="Add Belgian stations (TELERAD, FANC)", d_tel="Optional, for private use. Hourly values of the Belgian air stations from the public map service of the regulator FANC. It has no published terms of reuse and no documented interface, so it may change without notice.",
         wm="Wind used for the warning", d_wm="Wind at about 1.5 km height (Open-Meteo, 850 hPa) is how a plume travels; the surface wind can differ by 40 to 70 degrees and is much slower. Both: a station counts as upwind if either wind points to it.", wm_both="Height and surface (recommended)", wm_upper="Height only (Open-Meteo)", wm_surface="Surface only (weather entity)",
         med="Regional median",
         bs="Warning", msg="Message", alert="Alert", ev_warning="Warning", ev_notable="Station notable", ev_clear="All clear",
@@ -16,7 +17,7 @@ TEXT = {
         d_n_svc="Notify services, for example notify.mobile_app_phone. Empty: no notifications. The entities and the alert event work either way.",
         d_n_notable="Otherwise only for a warning (notable station upwind).", d_n_clear="When the level goes back to calm.",
         title="Radiation Watch",
-        desc="Dose rate stations around your home (German BfS network and European EURDEP), wind based early warning and a map card. Map tiles are downloaded once from OpenStreetMap and then served locally.",
+        desc="Dose rate stations around your home (German BfS network, optionally Belgian TELERAD), wind based early warning and a map card. Map tiles are downloaded once from OpenStreetMap and then served locally.",
         lat="Latitude", lon="Longitude", near="Near radius", far="Far radius", wind="Weather entity for wind", wfb="Fallback weather entity", scan="Update interval",
         d_lat="Centre of the map, defaults to your Home Assistant location.", d_near="Radius of the near view.",
         d_far="Radius of the far view and of the station search. Stations further away are ignored.",
@@ -31,6 +32,7 @@ TEXT = {
         st="Stations", ew="Early warning", calm="Calm", notable="Notable", warning="Warning", btn="Regenerate map",
     ),
     "de": dict(
+        tel="Belgische Stationen ergänzen (TELERAD, FANC)", d_tel="Optional, für die private Nutzung. Stündliche Werte der belgischen Luftstationen aus dem öffentlichen Kartendienst der Aufsichtsbehörde FANC. Es gibt keine veröffentlichten Nutzungsbedingungen und keine dokumentierte Schnittstelle, der Dienst kann sich jederzeit ändern.",
         wm="Wind für die Warnung", d_wm="Wind in etwa 1,5 km Höhe (Open-Meteo, 850 hPa) bestimmt, wohin eine Wolke zieht; der Bodenwind weicht oft um 40 bis 70 Grad ab und ist viel langsamer. Beide: Eine Station gilt als im Wind, wenn einer der beiden auf sie zeigt.", wm_both="Höhe und Boden (empfohlen)", wm_upper="Nur Höhe (Open-Meteo)", wm_surface="Nur Boden (Wetter-Entität)",
         med="Median Region",
         bs="Warnung", msg="Meldung", alert="Alarm", ev_warning="Warnung", ev_notable="Station auffällig", ev_clear="Entwarnung",
@@ -38,7 +40,7 @@ TEXT = {
         d_n_svc="Notify-Dienste, zum Beispiel notify.mobile_app_handy. Leer: keine Benachrichtigungen. Die Entitäten und das Alarm-Ereignis funktionieren trotzdem.",
         d_n_notable="Sonst nur bei einer Warnung (auffällige Station im Wind).", d_n_clear="Wenn die Stufe wieder auf ruhig fällt.",
         title="Radiation Watch",
-        desc="Messstationen der Ortsdosisleistung rund um dein Zuhause (BfS-Messnetz und europäisches EURDEP), Frühwarnung nach Windrichtung und eine Kartenkarte. Die Kartenkacheln werden einmalig von OpenStreetMap geladen und danach lokal ausgeliefert.",
+        desc="Messstationen der Ortsdosisleistung rund um dein Zuhause (BfS-Messnetz, optional belgisches TELERAD), Frühwarnung nach Windrichtung und eine Kartenkarte. Die Kartenkacheln werden einmalig von OpenStreetMap geladen und danach lokal ausgeliefert.",
         lat="Breitengrad", lon="Längengrad", near="Radius Nah", far="Radius Weit", wind="Wetter-Entität für den Wind", wfb="Ersatz-Wetter-Entität", scan="Abrufintervall",
         d_lat="Mittelpunkt der Karte, vorbelegt mit dem Standort von Home Assistant.", d_near="Radius der Nah-Ansicht.",
         d_far="Radius der Weit-Ansicht und der Stationssuche. Weiter entfernte Stationen werden ignoriert.",
@@ -53,6 +55,7 @@ TEXT = {
         st="Stationen", ew="Frühwarnung", calm="Ruhig", notable="Auffällig", warning="Warnung", btn="Karte neu erzeugen",
     ),
     "fr": dict(
+        tel="Ajouter les stations belges (TELERAD, AFCN)", d_tel="Facultatif, pour un usage privé. Valeurs horaires des stations belges de l'air issues du service cartographique public de l'autorité AFCN. Il n'a ni conditions de réutilisation publiées ni interface documentée et peut changer sans préavis.",
         wm="Vent utilisé pour l'alerte", d_wm="Le vent à environ 1,5 km (Open-Meteo, 850 hPa) détermine où va un nuage ; le vent au sol peut s'écarter de 40 à 70 degrés et il est bien plus lent. Les deux : une station est au vent si l'un des deux vents pointe vers elle.", wm_both="Altitude et sol (recommandé)", wm_upper="Altitude seulement (Open-Meteo)", wm_surface="Sol seulement (entité météo)",
         med="Médiane régionale",
         bs="Alerte", msg="Message", alert="Alarme", ev_warning="Alerte", ev_notable="Station remarquable", ev_clear="Fin d'alerte",
@@ -60,7 +63,7 @@ TEXT = {
         d_n_svc="Services notify, par exemple notify.mobile_app_telephone. Vide : pas de notifications. Les entités et l'événement fonctionnent quand même.",
         d_n_notable="Sinon uniquement en cas d'alerte (station remarquable au vent).", d_n_clear="Quand le niveau redevient calme.",
         title="Radiation Watch",
-        desc="Stations de débit de dose autour de votre domicile (réseau allemand BfS et réseau européen EURDEP), alerte précoce selon le vent et une carte. Les tuiles OpenStreetMap sont téléchargées une seule fois puis servies localement.",
+        desc="Stations de débit de dose autour de votre domicile (réseau allemand BfS, en option réseau belge TELERAD), alerte précoce selon le vent et une carte. Les tuiles OpenStreetMap sont téléchargées une seule fois puis servies localement.",
         lat="Latitude", lon="Longitude", near="Rayon proche", far="Rayon lointain", wind="Entité météo pour le vent", wfb="Entité météo de secours", scan="Intervalle de mise à jour",
         d_lat="Centre de la carte, par défaut l'emplacement de Home Assistant.", d_near="Rayon de la vue proche.",
         d_far="Rayon de la vue lointaine et de la recherche des stations. Les stations plus éloignées sont ignorées.",
@@ -75,6 +78,7 @@ TEXT = {
         st="Stations", ew="Alerte précoce", calm="Calme", notable="Remarquable", warning="Alerte", btn="Régénérer la carte",
     ),
     "es": dict(
+        tel="Añadir estaciones belgas (TELERAD, FANC)", d_tel="Opcional, para uso privado. Valores horarios de las estaciones belgas de aire del servicio cartográfico público del regulador FANC. No tiene condiciones de reutilización publicadas ni interfaz documentada y puede cambiar sin previo aviso.",
         wm="Viento para la alerta", d_wm="El viento a unos 1,5 km (Open-Meteo, 850 hPa) determina hacia dónde va una nube; el viento en superficie puede desviarse de 40 a 70 grados y es mucho más lento. Ambos: una estación está a barlovento si cualquiera de los dos apunta hacia ella.", wm_both="Altura y superficie (recomendado)", wm_upper="Solo altura (Open-Meteo)", wm_surface="Solo superficie (entidad meteorológica)",
         med="Mediana regional",
         bs="Alerta", msg="Mensaje", alert="Alarma", ev_warning="Alerta", ev_notable="Estación llamativa", ev_clear="Fin de la alerta",
@@ -82,7 +86,7 @@ TEXT = {
         d_n_svc="Servicios notify, por ejemplo notify.mobile_app_telefono. Vacío: sin notificaciones. Las entidades y el evento funcionan igualmente.",
         d_n_notable="Si no, solo en caso de alerta (estación llamativa a barlovento).", d_n_clear="Cuando el nivel vuelve a tranquilo.",
         title="Radiation Watch",
-        desc="Estaciones de tasa de dosis alrededor de su hogar (red alemana BfS y red europea EURDEP), alerta temprana según el viento y una tarjeta de mapa. Los mosaicos de OpenStreetMap se descargan una sola vez y luego se sirven localmente.",
+        desc="Estaciones de tasa de dosis alrededor de su hogar (red alemana BfS, opcionalmente red belga TELERAD), alerta temprana según el viento y una tarjeta de mapa. Los mosaicos de OpenStreetMap se descargan una sola vez y luego se sirven localmente.",
         lat="Latitud", lon="Longitud", near="Radio cercano", far="Radio lejano", wind="Entidad meteorológica para el viento", wfb="Entidad meteorológica de reserva", scan="Intervalo de actualización",
         d_lat="Centro del mapa, por defecto la ubicación de Home Assistant.", d_near="Radio de la vista cercana.",
         d_far="Radio de la vista lejana y de la búsqueda de estaciones. Las estaciones más lejanas se ignoran.",
@@ -101,9 +105,9 @@ TEXT = {
 
 def build(t: dict) -> dict:
     base_data = {"latitude": t["lat"], "longitude": t["lon"], "radius_near": t["near"], "radius_far": t["far"],
-                 "wind_entity": t["wind"], "wind_fallback": t["wfb"], "wind_mode": t["wm"], "scan_interval": t["scan"]}
+                 "wind_entity": t["wind"], "wind_fallback": t["wfb"], "wind_mode": t["wm"], "use_telerad": t["tel"], "scan_interval": t["scan"]}
     base_desc = {"latitude": t["d_lat"], "radius_near": t["d_near"], "radius_far": t["d_far"],
-                 "wind_entity": t["d_wind"], "wind_fallback": t["d_wfb"], "wind_mode": t["d_wm"]}
+                 "wind_entity": t["d_wind"], "wind_fallback": t["d_wfb"], "wind_mode": t["d_wm"], "use_telerad": t["d_tel"]}
     rules_data = {"abs_threshold": t["abs"], "median_factor": t["fac"], "median_offset": t["off"],
                   "sector": t["sec"], "min_wind": t["minw"], "max_age": t["age"]}
     notify_data = {"notify_services": t["n_svc"], "notify_notable": t["n_notable"], "notify_all_clear": t["n_clear"]}

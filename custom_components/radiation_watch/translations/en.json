@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Radiation Watch",
-        "description": "Dose rate stations around your home (German BfS network and European EURDEP), wind based early warning and a map card. Map tiles are downloaded once from OpenStreetMap and then served locally.",
+        "description": "Dose rate stations around your home (German BfS network, optionally Belgian TELERAD), wind based early warning and a map card. Map tiles are downloaded once from OpenStreetMap and then served locally.",
         "data": {
           "latitude": "Latitude",
           "longitude": "Longitude",
@@ -12,6 +12,7 @@
           "wind_entity": "Weather entity for wind",
           "wind_fallback": "Fallback weather entity",
           "wind_mode": "Wind used for the warning",
+          "use_telerad": "Add Belgian stations (TELERAD, FANC)",
           "scan_interval": "Update interval"
         },
         "data_description": {
@@ -20,7 +21,8 @@
           "radius_far": "Radius of the far view and of the station search. Stations further away are ignored.",
           "wind_entity": "Provides wind direction and speed (attributes wind_bearing and wind_speed).",
           "wind_fallback": "Used when the first one has no wind data.",
-          "wind_mode": "Wind at about 1.5 km height (Open-Meteo, 850 hPa) is how a plume travels; the surface wind can differ by 40 to 70 degrees and is much slower. Both: a station counts as upwind if either wind points to it."
+          "wind_mode": "Wind at about 1.5 km height (Open-Meteo, 850 hPa) is how a plume travels; the surface wind can differ by 40 to 70 degrees and is much slower. Both: a station counts as upwind if either wind points to it.",
+          "use_telerad": "Optional, for private use. Hourly values of the Belgian air stations from the public map service of the regulator FANC. It has no published terms of reuse and no documented interface, so it may change without notice."
         }
       }
     },
@@ -45,6 +47,7 @@
           "wind_entity": "Weather entity for wind",
           "wind_fallback": "Fallback weather entity",
           "wind_mode": "Wind used for the warning",
+          "use_telerad": "Add Belgian stations (TELERAD, FANC)",
           "scan_interval": "Update interval",
           "abs_threshold": "Absolute threshold",
           "median_factor": "Factor above median",
@@ -63,6 +66,7 @@
           "wind_entity": "Provides wind direction and speed (attributes wind_bearing and wind_speed).",
           "wind_fallback": "Used when the first one has no wind data.",
           "wind_mode": "Wind at about 1.5 km height (Open-Meteo, 850 hPa) is how a plume travels; the surface wind can differ by 40 to 70 degrees and is much slower. Both: a station counts as upwind if either wind points to it.",
+          "use_telerad": "Optional, for private use. Hourly values of the Belgian air stations from the public map service of the regulator FANC. It has no published terms of reuse and no documented interface, so it may change without notice.",
           "abs_threshold": "A station at or above this value is always notable.",
           "median_factor": "A station is notable when it is above median x factor and above median + minimum distance.",
           "median_offset": "A station is notable when it is above median x factor and above median + minimum distance.",

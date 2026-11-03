@@ -1,4 +1,4 @@
-"""Client for the open BfS WFS service (German ODL network and European EURDEP data)."""
+"""Clients for the station data: BfS WFS (German ODL network) and optionally FANC TELERAD (Belgium)."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ import re
 
 import aiohttp
 
-from .const import LAYER_EURDEP, LAYER_ODL_DE, USER_AGENT, WFS_URL
-from .geo import KM_PER_DEG_LAT, Station, distance_bearing
+from .const import LAYER_ODL_DE, TELERAD_URL, USER_AGENT, WFS_URL
+from .geo import KM_PER_DEG_LAT, Station, distance_bearing, parse_telerad
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ def _params(layer: str, cql: str) -> dict[str, str]:
 
 
 def parse_features(
-    features: list[dict], eurdep: bool, lat: float, lon: float, radius_km: float, max_age_h: float, now: datetime
+    features: list[dict], lat: float, lon: float, radius_km: float, max_age_h: float, now: datetime
 ) -> list[Station]:
     """Turn GeoJSON features into stations: inside the radius, with a value, not older than max_age_h."""
     oldest = now - timedelta(hours=max_age_h)
@@ -69,46 +69,58 @@ def parse_features(
         name = str(props.get("name") or "?")
         if name.isupper():
             name = name.title()
-        if eurdep:
-            # Feature id looks like "eurdep_latestValue.BE55700", the country code leads the station id.
-            country = str(f.get("id", "")).split(".")[-1][:2] or "EU"
-        else:
-            country = "DE"
         out.append(
-            Station(name=name, latitude=s_lat, longitude=s_lon, value=float(value), country=country, measured=measured.timestamp())
+            Station(name=name, latitude=s_lat, longitude=s_lon, value=float(value), country="DE", measured=measured.timestamp())
         )
     return out
 
 
-SOURCE_EURDEP = "eurdep"
 SOURCE_ODL_DE = "odl_de"
+SOURCE_TELERAD = "telerad"
+
+
+def active_sources(use_telerad: bool) -> list[str]:
+    return [SOURCE_ODL_DE, SOURCE_TELERAD] if use_telerad else [SOURCE_ODL_DE]
+
+
+async def _get_json(session: aiohttp.ClientSession, url: str, params: dict[str, str]) -> dict:
+    async with session.get(
+        url, params=params, headers={"User-Agent": USER_AGENT}, timeout=aiohttp.ClientTimeout(total=45)
+    ) as resp:
+        resp.raise_for_status()
+        return parse_body(await resp.text())
+
+
+async def _fetch_odl_de(session: aiohttp.ClientSession, lat: float, lon: float, radius_km: float, max_age_h: float) -> list[Station]:
+    cql = f"site_status=1 AND BBOX(geom,{_bbox(lat, lon, radius_km)})"
+    data = await _get_json(session, WFS_URL, _params(LAYER_ODL_DE, cql))
+    return parse_features(data.get("features") or [], lat, lon, radius_km, max_age_h, datetime.now(timezone.utc))
+
+
+async def _fetch_telerad(session: aiohttp.ClientSession, lat: float, lon: float, radius_km: float, max_age_h: float) -> list[Station]:
+    params = {
+        "where": "StationType='L'",
+        "outFields": "Name,Location,Lat,Lon,InServiceNL,Unite,Station_Value,StationType,Date_Time",
+        "returnGeometry": "false",
+        "resultRecordCount": "2000",
+        "f": "json",
+    }
+    data = await _get_json(session, TELERAD_URL, params)
+    if "error" in data:  # ArcGIS reports errors with HTTP 200
+        raise ValueError(f"service error: {data['error'].get('message')}")
+    return parse_telerad(data.get("features") or [], lat, lon, radius_km, max_age_h, datetime.now(timezone.utc).timestamp())
 
 
 async def async_fetch_stations(
-    session: aiohttp.ClientSession, lat: float, lon: float, radius_km: float, max_age_h: float
+    session: aiohttp.ClientSession, lat: float, lon: float, radius_km: float, max_age_h: float, use_telerad: bool = False
 ) -> dict[str, list[Station] | None]:
-    """Fetch both layers. Per source the stations, or None when that source failed."""
-    bbox = _bbox(lat, lon, radius_km)
-    # EURDEP lists each station once per analysis window (6/12/24/48/72 h) with the same value.
-    sources = [
-        (SOURCE_EURDEP, LAYER_EURDEP, f"analyzed_range_in_h=6 AND BBOX(geom,{bbox})", True),
-        (SOURCE_ODL_DE, LAYER_ODL_DE, f"site_status=1 AND BBOX(geom,{bbox})", False),
-    ]
-    now = datetime.now(timezone.utc)
+    """Per active source the stations, or None when that source failed."""
+    fetchers = {SOURCE_ODL_DE: _fetch_odl_de, SOURCE_TELERAD: _fetch_telerad}
     result: dict[str, list[Station] | None] = {}
-    for key, layer, cql, eurdep in sources:
+    for key in active_sources(use_telerad):
         try:
-            async with session.get(
-                WFS_URL,
-                params=_params(layer, cql),
-                headers={"User-Agent": USER_AGENT},
-                timeout=aiohttp.ClientTimeout(total=45),
-            ) as resp:
-                resp.raise_for_status()
-                data = parse_body(await resp.text())
+            result[key] = await fetchers[key](session, lat, lon, radius_km, max_age_h)
         except (aiohttp.ClientError, TimeoutError, ValueError) as err:
-            _LOGGER.warning("Fetching %s failed: %s", layer, err)
+            _LOGGER.warning("Fetching %s failed: %s", key, err)
             result[key] = None
-            continue
-        result[key] = parse_features(data.get("features") or [], eurdep, lat, lon, radius_km, max_age_h, now)
     return result

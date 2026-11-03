@@ -36,9 +36,9 @@
     "rings": "Anneau jaune : remarquable. Anneau rouge : remarquable et au vent."
   },
   "eta": "{name}, {km} km au vent : arrivée environ {eta} après la mesure.",
-  "eta_note": "Les valeurs ont jusqu'à 1,5 h (EURDEP environ 2 h), l'arrivée peut donc être plus tôt.",
+  "eta_note": "Les valeurs ont jusqu'à 1,5 h, l'arrivée peut donc être plus tôt.",
   "map_building": "Les images de la carte sont en cours de création, cela prend environ une minute.",
-  "attribution": "Carte © contributeurs OpenStreetMap · Données BfS, EURDEP",
+  "attribution": "Carte © contributeurs OpenStreetMap · Données BfS",
   "status": {
     "calm": {
       "title": "Alerte précoce : calme",

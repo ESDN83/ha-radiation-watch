@@ -128,3 +128,29 @@ def test_no_wind_at_all():
     stations = _background() + [st("Tihange", 50.53, 5.27, 0.9, "BE")]
     r = geo.evaluate(stations, *HOME, [], geo.Rules())
     assert r.state == "notable"
+
+
+def _tel(**kw):
+    a = {"StationType": "L", "Unite": "microSv/h", "InServiceNL": "Operationeel", "Station_Value": 0.08,
+         "Lat": 50.53, "Lon": 5.27, "Location": "Tihange", "Name": "IMA/T04", "Date_Time": "2026-11-03 23:00:00 UTC"}
+    a.update(kw)
+    return {"attributes": a}
+
+
+def test_telerad_parsing():
+    now = 1793746800.0  # 2026-11-03 23:00 UTC
+    keep = geo.parse_telerad([_tel()], *HOME, 120, 6, now)
+    assert [(s.name, s.value, s.country, s.measured) for s in keep] == [("Tihange", 0.08, "BE", now)]
+    dropped = [
+        _tel(StationType="W", Unite="cps", Station_Value=28.5),  # river water, not a dose rate
+        _tel(InServiceNL="Buiten Gebruik"),
+        _tel(Name="IMR/T15", Station_Value=0.32),  # on the plant site, permanently elevated
+        _tel(Unite="NULL"),
+        _tel(Station_Value=None),
+        _tel(Station_Value=0),
+        _tel(Date_Time=""),
+        _tel(Date_Time="2018-06-15 08:00:00 UTC"),  # older than max_age
+        _tel(Lat=51.33, Lon=3.2),  # outside the radius
+    ]
+    assert geo.parse_telerad(dropped, *HOME, 120, 6, now) == []
+

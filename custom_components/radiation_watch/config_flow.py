@@ -21,6 +21,7 @@ from .const import (
     CONF_NOTIFY_ALL_CLEAR,
     CONF_NOTIFY_NOTABLE,
     CONF_NOTIFY_SERVICES,
+    CONF_USE_TELERAD,
     CONF_WIND_MODE,
     DEFAULT_WIND_MODE,
     WIND_MODES,
@@ -70,6 +71,7 @@ def _base_schema(d: dict) -> dict:
     schema[vol.Required(CONF_WIND_MODE, default=d.get(CONF_WIND_MODE, DEFAULT_WIND_MODE))] = selector.SelectSelector(
         selector.SelectSelectorConfig(options=WIND_MODES, translation_key="wind_mode", mode=selector.SelectSelectorMode.LIST)
     )
+    schema[vol.Required(CONF_USE_TELERAD, default=bool(d.get(CONF_USE_TELERAD, False)))] = selector.BooleanSelector()
     schema[vol.Required(CONF_SCAN_INTERVAL, default=d.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL))] = _num(10, 240, 5, "min")
     return schema
 

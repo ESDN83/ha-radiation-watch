@@ -11,7 +11,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import SIGNAL_MAPS_UPDATED, RadiationWatchConfigEntry
-from .const import ATTRIBUTION_DATA, ATTRIBUTION_MAP, DOMAIN, URL_MAPS, VERSION, WARNING_STATES
+from .const import ATTRIBUTION_DATA, ATTRIBUTION_MAP, ATTRIBUTION_TELERAD, DOMAIN, URL_MAPS, VERSION, WARNING_STATES
 from .coordinator import StationCoordinator
 from .warning import SIGNAL_EVALUATED
 
@@ -21,7 +21,7 @@ def device_info(entry: RadiationWatchConfigEntry) -> DeviceInfo:
         identifiers={(DOMAIN, entry.entry_id)},
         name="Radiation Watch",
         manufacturer="ESDN83",
-        model="BfS / EURDEP",
+        model="BfS",
         sw_version=VERSION,
         entry_type=DeviceEntryType.SERVICE,
     )
@@ -158,6 +158,7 @@ class EarlyWarningSensor(EngineEntity, SensorEntity):
             "radius_far": s["radius_far"],
             "rules": {k: s[k] for k in ("abs_threshold", "median_factor", "median_offset", "sector", "min_wind", "max_age")},
             "attribution_wind": "Open-Meteo.com" if st.upper else None,
+            "attribution_stations": ATTRIBUTION_TELERAD if s["use_telerad"] else None,
             "fresh_count": st.fresh_count,
             "stale_count": st.stale_count,
             "data_time": st.data_time,

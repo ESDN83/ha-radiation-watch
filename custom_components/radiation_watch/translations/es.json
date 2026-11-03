@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Radiation Watch",
-        "description": "Estaciones de tasa de dosis alrededor de su hogar (red alemana BfS y red europea EURDEP), alerta temprana según el viento y una tarjeta de mapa. Los mosaicos de OpenStreetMap se descargan una sola vez y luego se sirven localmente.",
+        "description": "Estaciones de tasa de dosis alrededor de su hogar (red alemana BfS, opcionalmente red belga TELERAD), alerta temprana según el viento y una tarjeta de mapa. Los mosaicos de OpenStreetMap se descargan una sola vez y luego se sirven localmente.",
         "data": {
           "latitude": "Latitud",
           "longitude": "Longitud",
@@ -12,6 +12,7 @@
           "wind_entity": "Entidad meteorológica para el viento",
           "wind_fallback": "Entidad meteorológica de reserva",
           "wind_mode": "Viento para la alerta",
+          "use_telerad": "Añadir estaciones belgas (TELERAD, FANC)",
           "scan_interval": "Intervalo de actualización"
         },
         "data_description": {
@@ -20,7 +21,8 @@
           "radius_far": "Radio de la vista lejana y de la búsqueda de estaciones. Las estaciones más lejanas se ignoran.",
           "wind_entity": "Proporciona la dirección y la velocidad del viento (atributos wind_bearing y wind_speed).",
           "wind_fallback": "Se usa cuando la primera no tiene datos de viento.",
-          "wind_mode": "El viento a unos 1,5 km (Open-Meteo, 850 hPa) determina hacia dónde va una nube; el viento en superficie puede desviarse de 40 a 70 grados y es mucho más lento. Ambos: una estación está a barlovento si cualquiera de los dos apunta hacia ella."
+          "wind_mode": "El viento a unos 1,5 km (Open-Meteo, 850 hPa) determina hacia dónde va una nube; el viento en superficie puede desviarse de 40 a 70 grados y es mucho más lento. Ambos: una estación está a barlovento si cualquiera de los dos apunta hacia ella.",
+          "use_telerad": "Opcional, para uso privado. Valores horarios de las estaciones belgas de aire del servicio cartográfico público del regulador FANC. No tiene condiciones de reutilización publicadas ni interfaz documentada y puede cambiar sin previo aviso."
         }
       }
     },
@@ -45,6 +47,7 @@
           "wind_entity": "Entidad meteorológica para el viento",
           "wind_fallback": "Entidad meteorológica de reserva",
           "wind_mode": "Viento para la alerta",
+          "use_telerad": "Añadir estaciones belgas (TELERAD, FANC)",
           "scan_interval": "Intervalo de actualización",
           "abs_threshold": "Umbral absoluto",
           "median_factor": "Factor sobre la mediana",
@@ -63,6 +66,7 @@
           "wind_entity": "Proporciona la dirección y la velocidad del viento (atributos wind_bearing y wind_speed).",
           "wind_fallback": "Se usa cuando la primera no tiene datos de viento.",
           "wind_mode": "El viento a unos 1,5 km (Open-Meteo, 850 hPa) determina hacia dónde va una nube; el viento en superficie puede desviarse de 40 a 70 grados y es mucho más lento. Ambos: una estación está a barlovento si cualquiera de los dos apunta hacia ella.",
+          "use_telerad": "Opcional, para uso privado. Valores horarios de las estaciones belgas de aire del servicio cartográfico público del regulador FANC. No tiene condiciones de reutilización publicadas ni interfaz documentada y puede cambiar sin previo aviso.",
           "abs_threshold": "Una estación a partir de este valor siempre es llamativa.",
           "median_factor": "Una estación es llamativa si supera mediana x factor y mediana + distancia mínima.",
           "median_offset": "Una estación es llamativa si supera mediana x factor y mediana + distancia mínima.",

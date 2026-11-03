@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Radiation Watch",
-        "description": "Stations de débit de dose autour de votre domicile (réseau allemand BfS et réseau européen EURDEP), alerte précoce selon le vent et une carte. Les tuiles OpenStreetMap sont téléchargées une seule fois puis servies localement.",
+        "description": "Stations de débit de dose autour de votre domicile (réseau allemand BfS, en option réseau belge TELERAD), alerte précoce selon le vent et une carte. Les tuiles OpenStreetMap sont téléchargées une seule fois puis servies localement.",
         "data": {
           "latitude": "Latitude",
           "longitude": "Longitude",
@@ -12,6 +12,7 @@
           "wind_entity": "Entité météo pour le vent",
           "wind_fallback": "Entité météo de secours",
           "wind_mode": "Vent utilisé pour l'alerte",
+          "use_telerad": "Ajouter les stations belges (TELERAD, AFCN)",
           "scan_interval": "Intervalle de mise à jour"
         },
         "data_description": {
@@ -20,7 +21,8 @@
           "radius_far": "Rayon de la vue lointaine et de la recherche des stations. Les stations plus éloignées sont ignorées.",
           "wind_entity": "Fournit la direction et la vitesse du vent (attributs wind_bearing et wind_speed).",
           "wind_fallback": "Utilisée si la première n'a pas de données de vent.",
-          "wind_mode": "Le vent à environ 1,5 km (Open-Meteo, 850 hPa) détermine où va un nuage ; le vent au sol peut s'écarter de 40 à 70 degrés et il est bien plus lent. Les deux : une station est au vent si l'un des deux vents pointe vers elle."
+          "wind_mode": "Le vent à environ 1,5 km (Open-Meteo, 850 hPa) détermine où va un nuage ; le vent au sol peut s'écarter de 40 à 70 degrés et il est bien plus lent. Les deux : une station est au vent si l'un des deux vents pointe vers elle.",
+          "use_telerad": "Facultatif, pour un usage privé. Valeurs horaires des stations belges de l'air issues du service cartographique public de l'autorité AFCN. Il n'a ni conditions de réutilisation publiées ni interface documentée et peut changer sans préavis."
         }
       }
     },
@@ -45,6 +47,7 @@
           "wind_entity": "Entité météo pour le vent",
           "wind_fallback": "Entité météo de secours",
           "wind_mode": "Vent utilisé pour l'alerte",
+          "use_telerad": "Ajouter les stations belges (TELERAD, AFCN)",
           "scan_interval": "Intervalle de mise à jour",
           "abs_threshold": "Seuil absolu",
           "median_factor": "Facteur au-dessus de la médiane",
@@ -63,6 +66,7 @@
           "wind_entity": "Fournit la direction et la vitesse du vent (attributs wind_bearing et wind_speed).",
           "wind_fallback": "Utilisée si la première n'a pas de données de vent.",
           "wind_mode": "Le vent à environ 1,5 km (Open-Meteo, 850 hPa) détermine où va un nuage ; le vent au sol peut s'écarter de 40 à 70 degrés et il est bien plus lent. Les deux : une station est au vent si l'un des deux vents pointe vers elle.",
+          "use_telerad": "Facultatif, pour un usage privé. Valeurs horaires des stations belges de l'air issues du service cartographique public de l'autorité AFCN. Il n'a ni conditions de réutilisation publiées ni interface documentée et peut changer sans préavis.",
           "abs_threshold": "Une station à partir de cette valeur est toujours remarquable.",
           "median_factor": "Une station est remarquable si elle dépasse médiane x facteur et médiane + écart minimal.",
           "median_offset": "Une station est remarquable si elle dépasse médiane x facteur et médiane + écart minimal.",

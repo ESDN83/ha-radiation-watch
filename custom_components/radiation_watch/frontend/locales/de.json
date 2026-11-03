@@ -36,9 +36,9 @@
     "rings": "Gelber Ring: auffällig. Roter Ring: auffällig und im Wind."
   },
   "eta": "{name}, {km} km im Wind: Ankunft ca. {eta} nach der Messung.",
-  "eta_note": "Die Werte sind bis zu 1,5 h alt (EURDEP eher 2 h), die Ankunft kann also früher sein.",
+  "eta_note": "Die Werte sind bis zu 1,5 h alt, die Ankunft kann also früher sein.",
   "map_building": "Die Kartenbilder werden erzeugt, das dauert etwa eine Minute.",
-  "attribution": "Karte © OpenStreetMap-Mitwirkende · Daten BfS, EURDEP",
+  "attribution": "Karte © OpenStreetMap-Mitwirkende · Daten BfS",
   "status": {
     "calm": {
       "title": "Frühwarnung: ruhig",
